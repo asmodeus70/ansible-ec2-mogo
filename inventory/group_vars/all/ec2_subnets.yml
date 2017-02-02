@@ -1,0 +1,82 @@
+---
+cbe_subnets:
+  pres_elb:
+    az_a: 161.128/27
+    az_b: 161.160/27
+    az_c: 161.192/27
+  int_elb:
+    az_a: 38.128/27
+    az_b: 38.160/27
+    az_c: 38.192/27
+  suffix:
+    az_a: 74.128/27
+    az_b: 74.160/27
+    az_c: 74.192/27
+
+ec2_subnets:
+  build:
+    cbe-jenkins:
+      eu-west-1:
+        - name: build-jenkins-apps-b
+          cidr: 10.54.8.64/26
+          az: eu-west-1b
+          logical_name: build-jenkins-apps
+
+  elb_subnets: &cbe-services-subnets
+      eu-west-1:
+        - name: "{{deploy_env}}-cbe-int-pres-elb-a"
+          cidr: "{{platform_vpcs[deploy_env]['cidr_prefix']}}.{{cbe_subnets.pres_elb.az_a}}"
+          az: eu-west-1a
+          logical_name: "{{deploy_env}}-cbe-int-pres-elb"
+
+        - name: "{{deploy_env}}-cbe-int-pres-elb-b"
+          cidr: "{{platform_vpcs[deploy_env]['cidr_prefix']}}.{{cbe_subnets.pres_elb.az_b}}"
+          az: eu-west-1b
+          logical_name: "{{deploy_env}}-cbe-int-pres-elb"
+
+        - name: "{{deploy_env}}-cbe-int-pres-elb-c"
+          cidr: "{{platform_vpcs[deploy_env]['cidr_prefix']}}.{{cbe_subnets.pres_elb.az_c}}"
+          az: eu-west-1c
+          logical_name: "{{deploy_env}}-cbe-int-pres-elb"
+
+        - name: "{{deploy_env}}-cbe-int-elb-a"
+          cidr: "{{platform_vpcs[deploy_env]['cidr_prefix']}}.{{cbe_subnets.int_elb.az_a}}"
+          az: eu-west-1a
+          logical_name: "{{deploy_env}}-cbe-int-elb"
+
+        - name: "{{deploy_env}}-cbe-int-elb-b"
+          cidr: "{{platform_vpcs[deploy_env]['cidr_prefix']}}.{{cbe_subnets.int_elb.az_b}}"
+          az: eu-west-1b
+          logical_name: "{{deploy_env}}-cbe-int-elb"
+
+        - name: "{{deploy_env}}-cbe-int-elb-c"
+          cidr: "{{platform_vpcs[deploy_env]['cidr_prefix']}}.{{cbe_subnets.int_elb.az_c}}"
+          az: eu-west-1c
+          logical_name: "{{deploy_env}}-cbe-int-elb"
+
+        - name: "{{deploy_env}}-cbe-services-a"
+          cidr: "{{platform_vpcs[deploy_env]['cidr_prefix']}}.{{cbe_subnets.suffix.az_a}}"
+          az: eu-west-1a
+          logical_name: "{{deploy_env}}-cbe-services"
+
+        - name: "{{deploy_env}}-cbe-services-b"
+          cidr: "{{platform_vpcs[deploy_env]['cidr_prefix']}}.{{cbe_subnets.suffix.az_b}}"
+          az: eu-west-1b
+          logical_name: "{{deploy_env}}-cbe-services"
+
+        - name: "{{deploy_env}}-cbe-services-c"
+          cidr: "{{platform_vpcs[deploy_env]['cidr_prefix']}}.{{cbe_subnets.suffix.az_c}}"
+          az: eu-west-1c
+          logical_name: "{{deploy_env}}-cbe-services"
+
+  instance_subnets: &default_instance_subnets
+    vehicle-keeper-pres-service:
+      <<: *cbe-services-subnets
+    vehicle-keeper-enquiry-service:
+      <<: *cbe-services-subnets
+    cbe-mongo:
+      <<: *cbe-services-subnets
+  dev:
+    <<: *default_instance_subnets
+  test:
+    <<: *default_instance_subnets

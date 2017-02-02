@@ -1,0 +1,9 @@
+---
+# Vars used with route53-update role
+aws_route53:
+  cbe-jenkins:
+    name: cbe-jenkins
+    type: A
+  cbe-mongo:
+    name: cbe-mongo
+    type: A

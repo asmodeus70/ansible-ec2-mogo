@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ $# -ne 2 ]; then
 	echo "Illegal number of parameters. AWS region and environment required!"
-	echo "Usage: install-mongo-in us-east-1 production"
+	echo "Usage: install-mongo-in eu-west-1 dev"
 	exit 1;
 fi
 
@@ -20,7 +20,7 @@ done
 
 set -e
 for build in "${BUILDS[@]}"; do
-	ANSIBLE="ansible-playbook --extra-vars=\"target_region=$1 env=$2 deployment_group=$build\" --vault-password-file=vault-password.txt $MAIN_PLAYBOOK"
+	ANSIBLE="ansible-playbook --extra-vars=\"target_region=$1 env=$2 deployment_group=$build\" --vault-password-file=~/.vault $MAIN_PLAYBOOK"
 	echo "Running command: $ANSIBLE"
 	eval "${ANSIBLE}"
 done

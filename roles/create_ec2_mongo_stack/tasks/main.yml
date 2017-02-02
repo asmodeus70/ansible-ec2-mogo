@@ -4,8 +4,6 @@
   ec2_group:
     name: "mongo-access-{{ deployment.region }}"
     description: "Security group to control mongo access"
-    aws_access_key: "{{ access_key_id }}"
-    aws_secret_key: "{{ secret_access_key }}"
     region: "{{ deployment.region }}"
     vpc_id: "{{ mongo_vpc.vpc_id }}"
     rules:
@@ -31,13 +29,11 @@
 ######################
 - name: Create the single mongoDB leader node
   ec2:
-    aws_access_key: "{{ access_key_id }}"
-    aws_secret_key: "{{ secret_access_key }}"
     instance_type: "{{ deployment.mongodb.instance_type }}"
     image: "{{ deployment.mongodb.ami_id }}"
     wait: yes
     region: "{{ target_region }}"
-    assign_public_ip: yes
+    assign_public_ip: no
     vpc_subnet_id: "{{ mongo_leader_subnet.subnet.id }}"
     group_id:
       - "{{ mongo_security.group_id }}"
@@ -82,13 +78,11 @@
 # Create the database stack
 - name: Create minion nodes
   ec2:
-    aws_access_key: "{{ access_key_id }}"
-    aws_secret_key: "{{ secret_access_key }}"
     instance_type: "{{ deployment.mongodb.instance_type }}"
     image: "{{ deployment.mongodb.ami_id }}"
     wait: yes
     region: "{{ target_region }}"
-    assign_public_ip: yes
+    assign_public_ip: no
     vpc_subnet_id: "{{ item.1.subnet_id }}"
     group_id:
       - "{{ mongo_security.group_id }}"

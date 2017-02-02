@@ -1,14 +1,16 @@
 ---
-# Copy the repo file to /etc/yum.repos.d
-- name: Copy the repo file for mongo
-  template:
-    force: yes
-    src: mongodb-org-3.2.repo
-    dest: /etc/yum.repos.d/
+- name: Add MongoDB repository
+  yum_repository:
+    name: mongodb
+    description: Mongodb repo
+    baseurl: https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.4/x86_64/
+    gpgcheck: yes
+    gpgkey: https://www.mongodb.org/static/pgp/server-3.4.asc
+    enabled: yes
 
-# install and configure MongoDB
 - name: Install MongoDB
-  shell: yum install -y mongodb-org
+  mongodb_install:
+    yum: name=mongodb-org state=installed
 
 - name: Copy the configuration file template to the remote host
   template:

@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+import sys
+import os
+
+from ansible.module_utils.basic import AnsibleModule
+
+if (os.environ.get('BASE_DIR') != None):
+    sys.path.append(os.environ.get('BASE_DIR') + "/library/classes")
+else:
+    sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/classes")
+
+from iam_module import DvlaIam
+
+
+def main():
+    fields = {
+        "iam_name": {"required": True, "type": "str"},
+        "iam_type": {"required": True, "type": "str"}
+    }
+    ansible_module = AnsibleModule(argument_spec=fields)
+    iam_name = ansible_module.params['iam_name']
+    iam_type = ansible_module.params['iam_type']
+
+    iam = DvlaIam()
+
+    # TODO: this is only going to work for policies
+    response = iam.get_policy_by_name(iam_name)
+
+    returnValue = {
+        "iam_name": iam_name,
+        "iam_type": iam_type,
+        "response": response
+    }
+
+    ansible_module.exit_json(changed=False, dvla_iam_facts=returnValue)
+
+if __name__ == '__main__':
+    main()

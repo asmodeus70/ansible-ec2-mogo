@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+# iam_policy provided by ansible will only allow a policy attached to a role.
+# this is a quick and dirty solution to add a policy standalone, until a more appropriate solution is found.
+# needs environment credentials set AWS_SESSION_TOKEN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEYs
+# TODO: this needs some serious tidying up!
+# error handling
+# pass back response
+# pass back whether update happenedsorry
+
+import boto3
+import sys
+import os
+
+from ansible.module_utils.basic import AnsibleModule
+
+if (os.environ.get('BASE_DIR') != None):
+    sys.path.append(os.environ.get('BASE_DIR') + "/library/classes")
+else:
+    sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/classes")
+
+from iam_module import DvlaIam
+
+
+def main():
+    fields = {
+        "policy_name": {"required": True, "type": "str"},
+        "policy_document": {"required": True, "type": "str"},
+        "policy_description": {"required": True, "type": "str"}
+    }
+    ansible_module = AnsibleModule(argument_spec=fields)
+
+    policy_document = ansible_module.params['policy_document']
+    policy_name = ansible_module.params['policy_name']
+    policy_description = ansible_module.params['policy_description']
+    # TODO: check validity
+
+    iam = DvlaIam()
+
+    # TODO: exception handling
+    response = iam.create_policy(
+        policy_document, policy_name, policy_description)
+
+    returnValue = {
+        "policy_name": policy_name,
+        "policy_document": policy_document,
+        "response": response
+    }
+
+    ansible_module.exit_json(changed=True, dvla_iam_policy=returnValue)
+
+if __name__ == '__main__':
+    main()

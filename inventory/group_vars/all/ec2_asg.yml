@@ -1,0 +1,45 @@
+---
+ec2_asg:
+  build:
+    cbe-jenkins:
+      load_balancers: []
+      min_size: 1
+      max_size: 1
+      desired_capacity: 1
+      replace_batch_size: 1
+      health_check_type: EC2
+      health_check_period: 30
+      subnets_logical_name: build-jenkins-apps
+
+  default_asg: &default_asg
+    vehicle-keeper-pres-service:
+      min_size: 1
+      max_size: 1
+      desired_capacity: 1
+      replace_batch_size: 1
+      health_check_type: EC2
+      health_check_period: 30
+      subnets_logical_name: "{{deploy_env}}-cbe-services"
+
+    vehicle-keeper-enquiry-service:
+      min_size: 1
+      max_size: 1
+      desired_capacity: 1
+      replace_batch_size: 1
+      health_check_type: EC2
+      health_check_period: 30
+      subnets_logical_name: "{{deploy_env}}-cbe-services"
+
+    cbe-mongo:
+      min_size: 1
+      max_size: 1
+      desired_capacity: 1
+      replace_batch_size: 1
+      health_check_type: EC2
+      health_check_period: 30
+      subnets_logical_name: "{{deploy_env}}-cbe-services"
+
+  dev:
+    <<: *default_asg
+  test:
+    <<: *default_asg

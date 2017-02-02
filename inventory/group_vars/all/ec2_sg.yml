@@ -1,0 +1,182 @@
+---
+ec2_sg:
+  build:
+    cbe-jenkins:
+      - name: "{{deploy_env}}-cbe-jenkins"
+        description: Jenkins HTTP internal access
+        rules:
+          - proto: tcp
+            from_port: 443
+            to_port: 443
+            cidr_ip: 10.54.0.0/22
+          - proto: tcp
+            from_port: 8080
+            to_port: 8080
+            cidr_ip: 10.54.0.0/22
+        rules_egress:
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+
+  dev:
+    vehicle-keeper-pres-service:
+      - name: "{{deploy_env}}-cbe-pres-service-elb"
+        description: CBE Presentation Service HTTP internal access
+        rules:
+          - proto: tcp
+            from_port: 9188
+            to_port: 9189
+            cidr_ip: 10.54.0.0/16 # DVLA in other envs
+        rules_egress:
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+
+      - name: "{{deploy_env}}-cbe-pres-service"
+        description: CBE Presentation Service instances
+        rules:
+          - proto: tcp
+            from_port: 9188
+            to_port: 9189
+            group_name: "{{deploy_env}}-cbe-pres-service-elb"
+        rules_egress:
+          - proto: tcp
+            from_port: 9190
+            to_port: 9191
+            group_name: "{{deploy_env}}-cbe-enq-service-elb"
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+
+    vehicle-keeper-enquiry-service:
+      - name: "{{deploy_env}}-cbe-enq-service-elb"
+        description: CBE Enquiry Service HTTP internal access
+        rules:
+          - proto: tcp
+            from_port: 9190
+            to_port: 9191
+            group_name: "{{deploy_env}}-cbe-pres-service"
+        rules_egress:
+          - proto: tcp
+            to_port: 27017
+            from_port: 27017
+            group_name: "{{deploy_env}}-cbe-mongo"
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+
+      - name: "{{deploy_env}}-cbe-enq-service"
+        description: CBE Enquiry Service instances
+        rules:
+          - proto: tcp
+            from_port: 9190
+            to_port: 9191
+            group_name: "{{deploy_env}}-cbe-enq-service-elb"
+        rules_egress:
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+          - proto: tcp
+            from_port: 27017
+            to_port: 27017
+            group_name: "{{deploy_env}}-cbe-mongo"
+
+    cbe-mongo:
+      - name: "{{deploy_env}}-cbe-mongo"
+        description: CBE Mongo instances
+        rules:
+          - proto: tcp
+            to_port: 27017
+            from_port: 27017
+            group_name: "{{deploy_env}}-cbe-enq-service-elb"
+        rules_egress:
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+
+  test:
+    vehicle-keeper-pres-service:
+      - name: "{{deploy_env}}-cbe-pres-service-elb"
+        description: CBE Presentation Service HTTP internal access
+        rules:
+          - proto: tcp
+            from_port: 9188
+            to_port: 9189
+            cidr_ip: 10.54.0.0/16 # DVLA in other envs
+        rules_egress:
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+
+      - name: "{{deploy_env}}-cbe-pres-service"
+        description: CBE Presentation Service instances
+        rules:
+          - proto: tcp
+            from_port: 9188
+            to_port: 9189
+            group_name: "{{deploy_env}}-cbe-pres-service-elb"
+        rules_egress:
+          - proto: tcp
+            from_port: 9190
+            to_port: 9191
+            group_name: "{{deploy_env}}-cbe-enq-service-elb"
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+
+    vehicle-keeper-enquiry-service:
+      - name: "{{deploy_env}}-cbe-enq-service-elb"
+        description: CBE Enquiry Service HTTP internal access
+        rules:
+          - proto: tcp
+            from_port: 9190
+            to_port: 9191
+            group_name: "{{deploy_env}}-cbe-pres-service"
+        rules_egress:
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+
+      - name: "{{deploy_env}}-cbe-enq-service"
+        description: CBE Enquiry Service instances
+        rules:
+          - proto: tcp
+            from_port: 9190
+            to_port: 9191
+            group_name: "{{deploy_env}}-cbe-enq-service-elb"
+        rules_egress:
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16
+          - proto: tcp
+            from_port: 27017
+            to_port: 27017
+            group_name: "{{deploy_env}}-cbe-mongo"
+
+    cbe-mongo:
+      - name: "{{deploy_env}}-cbe-mongo"
+        description: CBE Mongo instances
+        rules:
+          - proto: tcp
+            to_port: 27017
+            from_port: 27017
+            group_name: "{{deploy_env}}-cbe-enq-service"
+          - proto: tcp
+            to_port: 27017
+            from_port: 27017
+            cidr_ip: 10.54.0.0/16
+        rules_egress:
+          - proto: tcp
+            from_port: 3128
+            to_port: 3128
+            cidr_ip: 10.54.0.0/16

@@ -1,0 +1,255 @@
+# This is used to manage Ansible role dependences
+# http://docs.ansible.com/ansible/galaxy.html
+# http://docs.ansible.com/galaxy.html#installing-multiple-roles-from-a-file
+# Install with: `ansible-galaxy install -r requirements.yml`
+
+# DVLA roles
+- src: ssh://git@stash.idsp.dvla.gov.uk:7999/cis/ansible-role-ebs-persistent-storage
+  scm: git
+  name: ebs-persistent-storage
+
+- src: ssh://git@stash.idsp.dvla.gov.uk:7999/cis/ansible-role-sts-start.git
+  scm: git
+  name: sts-start
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/~kingstj/ansible-role-ami-start
+  scm: git
+  name: ami-start
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-launch-config
+  scm: git
+  name: launch-config
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-asg-action-defaults
+  scm: git
+  name: custom-modules
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-custom-modules
+  scm: git
+  name: custom-modules
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-ntp
+  scm: git
+  name: ntp
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-custom-filters
+  scm: git
+  name: custom-filters
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-deploy-prompts
+  scm: git
+  name: deploy-prompts
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-common-vars
+  scm: git
+  name: common-vars
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-sts-session
+  scm: git
+  name: sts-session
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-sts-start
+  scm: git
+  name: sts-start
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-sts-continue
+  scm: git
+  name: sts-continue
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-ami-start
+  scm: git
+  name: ami-start
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-ami-finish
+  scm: git
+  name: ami-finish
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-auto-scaling-group
+  scm: git
+  name: auto-scaling-group
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-asg-action-startup
+  scm: git
+  name: asg-action-startup
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-asg-action-shutdown
+  scm: git
+  name: asg-action-shutdown
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-asg-action-defaults
+  scm: git
+  name: asg-action-defaults
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-load-balancer
+  scm: git
+  name: load-balancer
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-load-balancer-facts
+  scm: git
+  name: load-balancer-facts
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-subnets
+  scm: git
+  name: subnets
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-security-groups
+  scm: git
+  version: egress-rules
+  name: security-groups
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-route53-self-update
+  scm: git
+  name: route53-self-update
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-route53-add
+  scm: git
+  name: route53-add
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-base
+  scm: git
+  name: base
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-clamav
+  scm: git
+  name: clamav
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-iptables
+  scm: git
+  name: iptables
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-sshd-config
+  scm: git
+  name: sshd-config
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-disable-ipv6
+  scm: git
+  name: disable-ipv6
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-cron-amend-mailto
+  scm: git
+  name: cron-amend-mailto
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-bash-prompt
+  scm: git
+  name: bash-prompt
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-yum-config
+  scm: git
+  name: yum-config
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-yum-updates
+  scm: git
+  name: yum-updates
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-squid
+  scm: git
+  name: squid
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-squid-profile
+  scm: git
+  name: squid-profile
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-squid-profile-build
+  scm: git
+  name: squid-profile-build
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-platform-vars
+  scm: git
+  name: platform-vars
+  version: feature/t2_small_for_buildbox
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-java-openjdk-8
+  scm: git
+  name: java-openjdk-8
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-ansible
+  scm: git
+  name: ansible
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-boto
+  scm: git
+  name: boto
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-nfs-utils
+  scm: git
+  name: nfs-utils
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-pip
+  scm: git
+  name: pip
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-pip-devel
+  scm: git
+  name: pip-devel
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-ntp
+  scm: git
+  name: ntp
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-nginx
+  scm: git
+  name: nginx
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-nginx-https-front-upstream
+  scm: git
+  name: nginx-https-front-upstream
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-jenkins
+  scm: git
+  name: jenkins
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-app
+  scm: git
+  name: app
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-logstash
+  scm: git
+  name: logstash
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-logstash-input-syslog
+  scm: git
+  name: logstash-input-syslog
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-logstash-output-sqs
+  scm: git
+  name: logstash-output-sqs
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-rsyslog
+  scm: git
+  name: rsyslog
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-repo-logstash
+  scm: git
+  name: repo-logstash
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-logstash-input-app
+  scm: git
+  name: logstash-input-app
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-sonarqube
+  scm: git
+  name: sonarqube
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-ebs-format
+  scm: git
+  name: ebs-format
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-ebs-mount
+  scm: git
+  name: ebs-mount
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-ebs-snapshot
+  scm: git
+  name: ebs-snapshot
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-unzip
+  scm: git
+  name: unzip
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-awscli
+  scm: git
+  name: awscli
+
+- src: ssh://git@stash.cis.dvla.gov.uk:7999/cis/ansible-role-ssg
+  scm: git
+  name: ssg

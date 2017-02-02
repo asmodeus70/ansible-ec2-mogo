@@ -7,7 +7,6 @@
   connection: local
   vars_files:
     - vars/config.yml
-    - vars/credentials.yml
     - "regions/mongodb_{{ target_region }}_{{ deployment_group }}.yml"
   roles:
     - init_vpc

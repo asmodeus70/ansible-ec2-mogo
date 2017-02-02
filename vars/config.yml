@@ -2,10 +2,10 @@
 # SSH configuration
 ec2_ssh_user: ec2-user
 ssh_key_name: mongo
-ssh_key_path: keys/mongo.pem
+ssh_key_path: keys/scp1.pem
 
 # Miscellaneous
-application: MongoExample
+application: MongoDB
 
 # global variables
 mongo_subnets_to_azs: []

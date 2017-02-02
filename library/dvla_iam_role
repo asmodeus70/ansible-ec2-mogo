@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+import boto3
+import sys
+import os
+
+from ansible.module_utils.basic import AnsibleModule
+
+if (os.environ.get('BASE_DIR') != None):
+    sys.path.append(os.environ.get('BASE_DIR') + "/library/classes")
+else:
+    sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/classes")
+
+from iam_module import DvlaIam
+
+
+def main():
+    fields = {
+        "role_name": {"required": True, "type": "str"},
+        "assume_role_policy_document": {"required": True, "type": "str"}
+    }
+    ansible_module = AnsibleModule(argument_spec=fields)
+
+    role_name = ansible_module.params['role_name']
+    assume_role_policy_document = ansible_module.params[
+        'assume_role_policy_document']
+    # TODO: check validity
+
+    iam = DvlaIam()
+
+    try:
+        iam.create_role(role_name=role_name,
+                        assume_role_policy_document=assume_role_policy_document)
+        ansible_changed = True
+    except Exception:
+        ansible_changed = False
+
+    # TODO: catch exception and return an error
+
+    returnValue = {
+        "role_name": role_name,
+        "assume_role_policy_document": assume_role_policy_document
+    }
+
+    ansible_module.exit_json(changed=ansible_changed,
+                             dvla_iam_role=returnValue)
+
+if __name__ == '__main__':
+    main()

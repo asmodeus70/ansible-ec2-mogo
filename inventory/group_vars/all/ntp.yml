@@ -1,0 +1,10 @@
+---
+ntp:
+  default:
+    - 0.rhel.pool.ntp.org
+    - 1.rhel.pool.ntp.org
+    - 2.rhel.pool.ntp.org
+    - 3.rhel.pool.ntp.org
+  prod:
+    - 172.25.58.12
+    - 172.25.58.28

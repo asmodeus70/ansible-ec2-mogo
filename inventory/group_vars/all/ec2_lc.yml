@@ -1,0 +1,43 @@
+---
+# The default disk size of the server. This
+# should be overridden from the playbook if a
+# different size is needed
+ec2_lc:
+  build:
+    cbe-jenkins:
+      instance_type: t2.small
+      assign_public_ip: no
+      instance_monitoring: no
+      key_name: scp1
+      security_group_names: ["{{deploy_env}}-jenkins", "{{deploy_env}}-management"]
+      instance_profile_name: "{{deploy_env}}-cbe-jenkins-ec2role"
+
+  default_lc: &default_lc
+    vehicle-keeper-pres-service:
+      instance_type: t2.small
+      assign_public_ip: no
+      instance_monitoring: no
+      key_name: scp1
+      security_group_names: ["{{deploy_env}}-cbe-pres-service", "{{deploy_env}}-management"]
+      instance_profile_name: "{{deploy_env}}-default-ec2role"
+
+    vehicle-keeper-enquiry-service:
+      instance_type: t2.small
+      assign_public_ip: no
+      instance_monitoring: no
+      key_name: scp1
+      security_group_names: ["{{deploy_env}}-cbe-enq-service", "{{deploy_env}}-management"]
+      instance_profile_name: "{{deploy_env}}-default-ec2role"
+
+    cbe-mongo:
+      instance_type: t2.small
+      assign_public_ip: no
+      instance_monitoring: no
+      key_name: scp1
+      security_group_names: ["{{deploy_env}}-cbe-mongo", "{{deploy_env}}-management"]
+      instance_profile_name: "{{deploy_env}}-r53update-ec2role"
+
+  dev:
+    <<: *default_lc
+  test:
+    <<: *default_lc

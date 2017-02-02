@@ -1,0 +1,57 @@
+---
+ec2_elbs:
+  cbe-jenkins:
+    name: cbe-jenkins-elb
+    scheme: internal
+    listeners:
+      - protocol: https # options are http, https, ssl, tcp
+        load_balancer_port: 443
+        instance_protocol: http
+        instance_port: 8080
+        ssl_certificate_id: "{{platform_certificates[deploy_env]}}"
+    health_check:
+        ping_protocol: tcp # options are http, https, ssl, tcp
+        ping_port: 8080
+        response_timeout: 3 # seconds
+        interval: 6 # seconds
+        unhealthy_threshold: 6
+        healthy_threshold: 4
+    security_groups: ["{{deploy_env}}-jenkins-elb"]
+
+  vehicle-keeper-pres-service:
+    name: cbe-pres-service-elb
+    scheme: internal
+    listeners:
+      - protocol: http
+        load_balancer_port: 9188
+        instance_port: 9188
+      - protocol: http
+        load_balancer_port: 9189
+        instance_port: 9189
+    health_check:
+        ping_protocol: tcp
+        ping_port: 9188
+        response_timeout: 3
+        interval: 6
+        unhealthy_threshold: 6
+        healthy_threshold: 4
+    security_groups: ["{{deploy_env}}-cbe-pres-service-elb"]
+
+  vehicle-keeper-enquiry-service:
+    name: cbe-enq-service-elb
+    scheme: internal
+    listeners:
+      - protocol: http
+        load_balancer_port: 9190
+        instance_port: 9190
+      - protocol: http
+        load_balancer_port: 9191
+        instance_port: 9191
+    health_check:
+        ping_protocol: tcp
+        ping_port: 9190
+        response_timeout: 3
+        interval: 15
+        unhealthy_threshold: 6
+        healthy_threshold: 4
+    security_groups: ["{{deploy_env}}-cbe-enq-service-elb"]

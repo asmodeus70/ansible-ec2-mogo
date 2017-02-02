@@ -1,0 +1,13 @@
+---
+app:
+  dev:
+    vehicle-keeper-enquiry-service:
+      repository: snapshots
+      packages:
+        - name: vehicle-keeper-enquiry-service
+          version: latest
+    vehicle-keeper-pres-service:
+      repository: snapshots
+      packages:
+        - name: vehicle-keeper-pres-service
+          version: latest

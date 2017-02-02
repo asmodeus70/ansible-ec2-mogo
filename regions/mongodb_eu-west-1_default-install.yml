@@ -5,16 +5,16 @@ deployment:
   environment: "{{ env }}"
   vpc_cidr: 172.24.0.0/16
   mongodb:
-    ami_id: ami-c481fad3
+    ami_id: ami-a0633bc6
     instance_type: t2.micro
     replica_set: "repl-{{ target_region }}"
     leader:
-      zone: "us-east-1b"
+      zone: "eu-west-1"
       subnet_cidr: 172.24.1.0/24
     azs:
-      - zone: "us-east-1c"
+      - zone: "eu-west-1"
         ensure_count: 2
         subnet_cidr: 172.24.2.0/24
-      - zone: "us-east-1b"
+      - zone: "eu-west-1"
         ensure_count: 1
         subnet_cidr: 172.24.1.0/24
