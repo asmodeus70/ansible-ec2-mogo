@@ -1,0 +1,25 @@
+---
+- name: deploy route53_update script
+  template: src=route53_update.sh dest="/root/route53_update.sh" mode=0700
+  tags:
+    - route53_update
+    - route53-self-update
+
+- name: deploy route53_update service script
+  template: src=init dest=/etc/init.d/route53_update mode=0755
+  tags:
+    - route53_update
+    - route53-self-update
+
+- name: add route53_update init
+  shell: "/sbin/chkconfig --add route53_update"
+  tags:
+    - route53_update
+    - route53-self-update
+
+- name: enable route53_update
+  service: name=route53_update enabled=yes
+  tags:
+    - route53_update
+    - route53-self-update
+

@@ -1,0 +1,6 @@
+---
+asg_action_shutdown_asg_name: "{{deploy_env}}-{{ec2_prefix}}-{{blue_green}}"
+asg_action_shutdown_cron: "0 19 * * MON-FRI"
+asg_action_shutdown_min_size: 0
+asg_action_shutdown_max_size: 0
+asg_action_shutdown_desired_capacity: 0

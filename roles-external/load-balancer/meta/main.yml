@@ -1,0 +1,19 @@
+---
+dependencies:
+  - deploy-prompts
+  - common-vars
+
+galaxy_info:
+  author: chris.cundill
+  description: Creates/updates an EC2 Elastic Load Balancer
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: Amazon
+      versions:
+        - all
+  galaxy_tags:
+    - elb
+    - elastic-load-balancer
+    - load-balancer

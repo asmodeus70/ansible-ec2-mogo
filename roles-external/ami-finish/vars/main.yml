@@ -1,0 +1,11 @@
+---
+build:
+  ami:
+    instance_id: "{{ec2_build.instances[0].id}}"
+    region: "{{aws_region}}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  terminate:
+    instance_id: "{{ ec2_build.instances[0].id }}"
+    region: "{{aws_region}}"

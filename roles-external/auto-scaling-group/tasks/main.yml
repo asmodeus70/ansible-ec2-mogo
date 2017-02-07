@@ -1,0 +1,65 @@
+---
+- name: Get subnet identifiers using subnets logical name for ec2_prefix
+  ec2_vpc_subnet_facts:
+    region: "{{aws_region}}"
+    filters:
+      "tag:Logical-Name": "{{ec2_asg[deploy_env][ec2_prefix].subnets_logical_name}}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: subnet_result
+  tags:
+    - auto-scaling-groups
+    - asg
+
+- name: Debug subnet_result
+  debug: msg="{{subnet_result}}"
+  tags:
+    - auto-scaling-groups
+    - asg
+
+- name: Set load balancers fact
+  set_fact:
+    load_balancers: [ "{{deploy_env}}-{{ec2_elbs[ec2_prefix].name}}-{{blue_green}}" ]
+  when: "{{ec2_elbs[ec2_prefix] is defined}}"
+  tags:
+    - auto-scaling-groups
+    - asg
+
+- name: Set load balancers empty fact
+  set_fact:
+    load_balancers: ''
+  when: "{{ec2_elbs[ec2_prefix] is not defined}}"
+  tags:
+    - auto-scaling-groups
+    - asg
+
+- name: Create/update auto scaling group
+  ec2_asg:
+    name: "{{asg_name}}"
+    launch_config_name: "{{asg_launch_config_name}}"
+    load_balancers: "{{ load_balancers if load_balancers != '' else omit }}"
+    health_check_period: "{{ ec2_asg[deploy_env][ec2_prefix].health_check_period }}"
+    health_check_type: "{{ ec2_asg[deploy_env][ec2_prefix].health_check_type }}"
+    replace_all_instances: yes
+    replace_batch_size: "{{ ec2_asg[deploy_env][ec2_prefix].replace_batch_size }}"
+    min_size: "{{ ec2_asg[deploy_env][ec2_prefix].min_size }}"
+    max_size: "{{ ec2_asg[deploy_env][ec2_prefix].max_size }}"
+    desired_capacity: "{{ ec2_asg[deploy_env][ec2_prefix].desired_capacity }}"
+    region: "{{aws_region}}"
+    state: present
+    vpc_zone_identifier: "{{ subnet_result.subnets|ec2_subnet_ids_all() }}"
+    wait_timeout: "{{asg_wait_timeout}}"
+    tags:
+      - Name: "{{deploy_env}}-{{ec2_prefix}}-{{blue_green}}"
+      - Project: "{{project.name}}"
+      - Service: "{{project.service_id}}"
+      - Environment: "{{deploy_env}}"
+      - DeployedBy: "{{build_box_user}}"
+      - BuildBranch: "{{build_branch}}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  tags:
+    - auto-scaling-groups
+    - asg

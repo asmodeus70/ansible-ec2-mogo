@@ -1,0 +1,21 @@
+---
+- name: Set to the app_repository fact
+  set_fact:
+    app_repository: "{{ app.repository | default('snapshots') }}"
+
+- name: Add Nexus yum repo as source for app installation
+  yum_repository:
+    name: nexus-{{app_repository}}
+    description: "Nexus yum repo ({{app_repository}})"
+    baseurl: "{{app_repo_base}}/{{app_repository}}/"
+    enabled: yes
+    gpgcheck: no
+    http_caching: packages
+    metadata_expire: 1m
+
+- name: Install and configure apps
+  include: install.yml
+  with_items: "{{app.packages}}"
+  loop_control:
+    loop_var: app_package
+

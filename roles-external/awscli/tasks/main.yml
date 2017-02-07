@@ -1,0 +1,14 @@
+---
+- name: Install pip
+  yum:
+    name=python-pip
+    state=present
+  tags:
+    - python
+    - python-pip
+    - awscli
+
+- name: install awscli, the aws cli toolset
+  shell: umask 022; pip install awscli
+  tags:
+    - awscli

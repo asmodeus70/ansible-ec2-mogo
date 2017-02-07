@@ -1,0 +1,6 @@
+myhostname = {{ansible_fqdn}}
+mydomain = {{ domain }}
+myorigin = $mydomain
+inet_interfaces = all
+mydestination = $myhostname, localhost, $mydomain
+relay_domains = $mydestination

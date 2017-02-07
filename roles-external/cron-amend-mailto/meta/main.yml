@@ -1,0 +1,18 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: geraint.lee
+  description: Resolves cron messages to email when postfix has been removed.
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: Amazon
+      versions:
+        - all
+  galaxy_tags:
+    - cron
+    - email
+    - postfix
+

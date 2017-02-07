@@ -1,0 +1,11 @@
+---
+- name: deploy rsyslog.conf
+  template:
+    src=rsyslog.conf
+    dest=/etc/rsyslog.conf
+  notify: restart rsyslog
+  tags: rsyslog
+
+- name: enable rsyslog
+  service: name=rsyslog enabled=true state=started
+  tags: rsyslog

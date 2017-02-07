@@ -1,0 +1,7 @@
+---
+disk_check_in_minutes: 60
+ebs_volume_script: ebs_volume.py
+ebs_volume_script_dir: /usr/local/sbin/ebs_volume
+ebs_script_location: "{{ebs_volume_script_dir}}/{{ebs_volume_script}}"
+ebs_volume_service: ebs_volume.service
+ebs_log_path: "/var/log/ebs_volume.log"

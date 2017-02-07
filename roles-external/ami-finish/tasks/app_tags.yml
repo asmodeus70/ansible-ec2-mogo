@@ -1,0 +1,7 @@
+---
+- name: Append app tags to dictionary
+  set_fact:
+    ami_finish_app_tags: "{{ ami_finish_app_tags| default({}) | combine({ 'App-Version-' + app_package.name:app_package.version }) }}"
+  tags:
+    - ami
+    - ami-finish

@@ -1,0 +1,184 @@
+---
+- name: Lookup security group
+  ec2_group_facts:
+    region: "{{aws_region}}"
+    vpc_id: "{{platform_vpcs[deploy_env].id}}"
+    group_names: "{{ ec2_lc[deploy_env][ec2_prefix].security_group_names }}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  tags:
+    - launch-config
+    - lc
+
+  register: sg_search_result
+  tags:
+    - launch-config
+    - lc
+
+- name: Debug security group search result
+  debug: msg="{{sg_search_result}}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Set base launch config facts
+  set_fact:
+    lc_image_id: "{{ ec2_build_ami.results[0].image_id if ec2_build_ami is defined else '' }}"
+    lc_root_volume_default:
+      device_name: /dev/sda1
+      volume_size: 50
+      device_type: gp2
+      delete_on_termination: true
+  tags:
+    - launch-config
+    - lc
+
+- name: Set root volume facts
+  set_fact:
+    lc_root_volume: "{{ec2_lc[deploy_env][ec2_prefix].root_volume|default(lc_root_volume_default)}}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Set storage volume facts
+  set_fact:
+    lc_storage_volume:
+      device_name: "{{ec2_lc[deploy_env][ec2_prefix].storage_volume.device_name}}"
+      volume_size: "{{ec2_lc[deploy_env][ec2_prefix].storage_volume.volume_size}}"
+      device_type: "{{ec2_lc[deploy_env][ec2_prefix].storage_volume.device_type}}"
+      delete_on_termination: "{{ec2_lc[deploy_env][ec2_prefix].storage_volume.delete_on_termination}}"
+      snapshot_id: "{{lc_storage_volume_snapshot_id}}"
+  when: "{{ ec2_lc[deploy_env][ec2_prefix].storage_volume is defined }}"
+  tags:
+    - launch-config
+    - lc
+
+- block:
+  - name: Set launch configuration volumes to include both root and storage volumes
+    set_fact:
+      lc_volumes: [ "{{lc_root_volume}}", "{{lc_storage_volume}}" ]
+    when: "{{ lc_storage_volume is defined }}"
+    tags:
+      - launch-config
+      - lc
+
+  - name: Set launch configuration volumes to include root volume only
+    set_fact:
+      lc_volumes: [ "{{lc_root_volume}}" ]
+    when: "{{ lc_storage_volume is undefined }}"
+    tags:
+      - launch-config
+      - lc
+
+  when: "{{ ec2_lc[deploy_env][ec2_prefix].omit_volumes is undefined or ec2_lc[deploy_env][ec2_prefix].omit_volumes == false }}"
+
+- block:
+  - name: Set app tag values when app dictionary entry for component exists
+    set_fact:
+      ami_find_app_repo: "{{app[deploy_env][ec2_prefix].repository|default('snapshots')}}"
+
+  - name: Set AMI find tags when all package versions are set to latest
+    set_fact:
+      ami_find_tags:
+        App-Repository: "{{ami_find_app_repo}}"
+    when: "{{ app[deploy_env][ec2_prefix].packages | app_versions_all_latest }}"
+
+  - name: Set AMI find tags when version is set to a specific value
+    set_fact:
+      ami_find_tags:
+        AMI-Version: "{{ app[deploy_env][ec2_prefix].packages | app_versions_string | sha256 }}"
+        App-Repository: "{{ami_find_app_repo}}"
+    when: "{{ app[deploy_env][ec2_prefix].packages | app_versions_all_latest == false }}"
+
+  when: "{{ app is defined and app[deploy_env] is defined and app[deploy_env][ec2_prefix] is defined }}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Set AMI name prefix for AMI find to include environment
+  set_fact:
+    launch_config_ami_find_name: "{{ deploy_env + '-' + ec2_prefix + '-*' }}"
+  when: "{{ launch_config_ami_name is undefined and ami_find_tags is undefined  }}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Set AMI name prefix for AMI find to exclude environment
+  set_fact:
+    launch_config_ami_find_name: "{{ ec2_prefix + '-*' }}"
+  when: "{{ launch_config_ami_name is undefined and ami_find_tags is defined  }}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Set AMI name prefix for AMI find to provided variable; launch_config_ami_name
+  set_fact:
+    launch_config_ami_find_name: "{{ launch_config_ami_name }}"
+  when: "{{ launch_config_ami_name is defined  }}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Find AMIs
+  ec2_ami_find:
+    name: "{{launch_config_ami_find_name}}"
+    ami_tags: "{{ami_find_tags|default(omit)}}"
+    region: "{{aws_region}}"
+    owner: "{{platform_vpcs['build']['account_id']}}"
+    sort: name
+    sort_order: descending
+    sort_end: 1
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: ami_find
+  when: "{{ lc_image_id is undefined or lc_image_id == '' }}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Set launch configuration image_id to value from ami find result
+  set_fact:
+    ec2_lc_image_id: "{{ ami_find.results[0].ami_id }}"
+  when: "{{ lc_image_id is undefined or lc_image_id == '' }}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Set launch configuration image_id to value provided in lc_image_id var
+  set_fact:
+    ec2_lc_image_id: "{{ lc_image_id }}"
+  when: "{{ lc_image_id is defined and lc_image_id != '' }}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Add any componet-specific user_data
+  set_fact:
+    ec2_lc_user_data: "{{ ec2_lc[deploy_env][ec2_prefix].user_data }}"
+  when: "{{ ec2_lc[deploy_env][ec2_prefix].user_data is defined }}"
+  tags:
+    - launch-config
+    - lc
+
+- name: Create Launch Configuration
+  ec2_lc:
+    name: "{{deploy_env}}-{{ec2_prefix}}-{{timestamp.stdout}}-{{blue_green}}"
+    image_id: "{{ ec2_lc_image_id }}"
+    key_name: "{{ ec2_lc[deploy_env][ec2_prefix].key_name }}"
+    security_groups: "{{ sg_search_result.sgs | ec2_security_group_ids_all() }}"
+    instance_type: "{{ ec2_lc[deploy_env][ec2_prefix].instance_type }}"
+    instance_monitoring: "{{ ec2_lc[deploy_env][ec2_prefix].instance_monitoring }}"
+    region: "{{aws_region}}"
+    volumes: "{{lc_volumes|default(omit)}}"
+    assign_public_ip: "{{ ec2_lc[deploy_env][ec2_prefix].assign_public_ip }}"
+    instance_profile_name: "{{ ec2_lc[deploy_env][ec2_prefix].instance_profile_name|default(omit) }}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+    user_data: "{{ lookup('template', 'user_data.sh') + ec2_lc_user_data|default('') }}"
+  tags:
+    - launch-config
+    - lc
+

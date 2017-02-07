@@ -1,0 +1,34 @@
+---
+platform_elasticsearch:
+  dev:
+    eu-west-1: search-dev-evtafb56knuwegjszs2aa7xohm.eu-west-1.es.amazonaws.com
+
+  test:
+    eu-west-1: search-test-m4sbcb3qtfnfzxw6a7c36ivpie.eu-west-1.es.amazonaws.com
+
+  int:
+    eu-west-1: search-int-s76qmozgutt2ufpoyzijecz4sy.eu-west-1.es.amazonaws.com
+
+  uat:
+    eu-west-1: search-uat-b7rcxwhrl3hqqu5tksjfnuf5qu.eu-west-1.es.amazonaws.com
+
+  qa:
+    eu-west-1: search-qa-logstash-oi3tlhpqhdafqxx46cwtlslcsy.eu-west-1.es.amazonaws.com
+
+  sit1:
+    eu-west-1: search-sit1-logstash-yklk32xzaerivzhhmfrn5he3v4.eu-west-1.es.amazonaws.com
+
+  sit2:
+    eu-west-1: search-sit2-logstash-tgq7mb5yag44aqde6v3kzytx44.eu-west-1.es.amazonaws.com
+
+  perf:
+    eu-west-1: search-perf-2vvyrx7s742ra2hb2w2zdyvi44.eu-west-1.es.amazonaws.com
+
+  preprod:
+    eu-west-1: search-ppd-kabl4vmvovshlpktvsy4epdcze.eu-west-1.es.amazonaws.com
+
+  prod:
+    eu-west-1: search-prod-q7qubsrbcjepimz5ssfunezn7y.eu-west-1.es.amazonaws.com
+
+  mgmt:
+    eu-west-1: search-mgmt-logstash-ztjp4wyqenmdvdah7wuydin5zm.eu-west-1.es.amazonaws.com

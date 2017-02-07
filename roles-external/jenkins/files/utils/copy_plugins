@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -o nounset
+
+readonly TARGET_DIR="$(dirname ${BASH_SOURCE[0]})/plugins"
+
+rm -f $TARGET_DIR/*
+[[ -d $TARGET_DIR ]] || mkdir $TARGET_DIR || { echo "Failed to create the target $TARGET_DIR"; exit 1; }
+sudo find ~jenkins/plugins -name '*.jpi' -exec cp {} $TARGET_DIR \;
+sudo chown ec2-user:ec2-user $TARGET_DIR/*

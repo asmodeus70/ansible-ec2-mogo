@@ -1,0 +1,3 @@
+---
+ebs_format_device: /dev/xvdf
+ebs_format_filesystem: xfs

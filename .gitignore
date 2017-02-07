@@ -4,3 +4,4 @@ vault-password.txt
 *.pem.encrypted
 credentials.yml
 .DS_Store
+ansible.cfg

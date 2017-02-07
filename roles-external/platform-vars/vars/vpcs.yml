@@ -1,0 +1,59 @@
+# cidr_prefix: the start of the CIDR for the VPC
+# cidr_adjust: the third octet adjustment, for example, CIDR prefix: 10.0, CIDR adjust: 8, would give you: 10.0.8.0
+# cidr_mask: the cidr mask, for example, /16 /22 etc
+---
+platform_vpcs:
+  build:
+    id: vpc-1fc70a7b
+    account_id: 392336992919
+    cidr_prefix: '10.54'
+    cidr_adjust: 8
+    cidr_mask: 22
+  dev:
+    id: vpc-3ac90e5e
+    account_id: 392336992919
+    cidr_prefix: '10.55'
+    cidr_adjust: 0
+    cidr_mask: 16
+  test:
+    id: vpc-c177b7a5
+    account_id: 392336992919
+    cidr_prefix: '10.56'
+    cidr_adjust: 0
+    cidr_mask: 16
+  int:
+    id: vpc-a477b7c0
+    account_id: 392336992919
+    cidr_prefix: '10.58'
+    cidr_adjust: 0
+    cidr_mask: 16
+  uat:
+    id: vpc-d677b7b2
+    account_id: 392336992919
+    cidr_prefix: '10.57'
+    cidr_adjust: 0
+    cidr_mask: 16
+  mgmt:
+    id: vpc-18edce7d
+    account_id: 957685622330
+    cidr_prefix: '10.54'
+    cidr_adjust: 0
+    cidr_mask: 22
+  perf:
+    id: vpc-e5c6ba81
+    account_id: 392336992919
+    cidr_prefix: '10.53'
+    cidr_adjust: 0
+    cidr_mask: 22
+  preprod:
+    id: vpc-17700573
+    account_id: 161773377830
+    cidr_prefix: '10.59'
+    cidr_adjust: 0
+    cidr_mask: 16
+  prod:
+    id: vpc-52d8ad36
+    account_id: 870051222499
+    cidr_prefix: '10.60'
+    cidr_adjust: 0
+    cidr_mask: 16

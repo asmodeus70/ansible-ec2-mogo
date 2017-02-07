@@ -1,0 +1,23 @@
+---
+- name: Acquire STS token from Assumed Role
+  sts_assume_role:
+    region: "{{aws_region}}"
+    role_arn: "arn:aws:iam::{{platform_vpcs['build'].account_id}}:role/{{lookup('env','AWS_DVLA_ROLE')}}"
+    role_session_name: "Ansible"
+    security_token: "{{sts_session_role.sts_creds.session_token}}"
+    aws_access_key: "{{sts_session_role.sts_creds.access_key}}"
+    aws_secret_key: "{{sts_session_role.sts_creds.secret_key}}"
+  when: mfa_token != ''
+  register: start_assumed_role
+  tags:
+    - always
+    - sts
+
+- name: Set STS Facts
+  set_fact:
+    sts_assumed_role: "{{start_assumed_role}}"
+  tags: sts
+  when: start_assumed_role.sts_creds is defined
+  tags:
+    - always
+    - sts

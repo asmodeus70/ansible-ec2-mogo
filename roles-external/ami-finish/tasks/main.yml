@@ -1,0 +1,133 @@
+---
+- name: Set base tags for AMI
+  set_fact:
+    ami_finish_base_tags:
+      Service: "{{project.service_id}}"
+      Project: "{{project.name}}"
+      Name: "{{ec2_prefix}}-{{timestamp.stdout}}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Add environment to Name tag for AMI if deploy_env provided
+  set_fact:
+    ami_finish_base_tags: "{{ ami_finish_base_tags | combine( {'Name': deploy_env + '-' + ec2_prefix + '-' + timestamp.stdout } ) }}"
+  when: "{{deploy_env is defined and deploy_env != '' and hostvars[groups['memory_hosts'][0]].app_installed_versions is undefined }}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Add Environment tag to base tags for AMI if deploy_env provided
+  set_fact:
+    ami_finish_base_tags: "{{ ami_finish_base_tags | combine( {'Environment': deploy_env } ) }}"
+  when: "{{deploy_env is defined and deploy_env != '' and hostvars[groups['memory_hosts'][0]].app_installed_versions is undefined }}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Set AMI tag for each installed app
+  include: app_tags.yml
+  with_items: "{{ hostvars[groups['memory_hosts'][0]].app_installed_versions|default([]) }}"
+  loop_control:
+    loop_var: app_package
+  tags:
+    - ami
+    - ami-finish
+
+- name: Set app tags for AMI to include App-Repository tag
+  set_fact:
+    ami_finish_app_tags: "{{ ami_finish_app_tags | combine({ 'App-Repository':hostvars[groups['memory_hosts'][0]].app_repository }) }}"
+  when: "{{ hostvars[groups['memory_hosts'][0]].app_installed_versions is defined }}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Set app tags for AMI to include AMI-Version tag
+  set_fact:
+    ami_finish_app_tags: "{{ ami_finish_app_tags | combine({ 'AMI-Version':hostvars[groups['memory_hosts'][0]].app_installed_versions | app_versions_string | sha256 }) }}"
+  when: "{{ hostvars[groups['memory_hosts'][0]].app_installed_versions is defined }}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Set app tags for AMI without app tags
+  set_fact:
+    ami_finish_tags: "{{ami_finish_base_tags}}"
+  when: "{{ hostvars[groups['memory_hosts'][0]].app_installed_versions is undefined }}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Set app tags for AMI to include app tags
+  set_fact:
+    ami_finish_tags: "{{ ami_finish_base_tags | combine(ami_finish_app_tags) }}"
+  when: "{{ hostvars[groups['memory_hosts'][0]].app_installed_versions is defined }}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Create ami
+  ec2_ami:
+    instance_id: "{{ build.ami.instance_id }}"
+    wait: yes
+    name: "{{ami_finish_base_tags['Name']}}"
+    region: "{{ build.ami.region }}"
+    tags: "{{ami_finish_tags}}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+    launch_permissions:
+      user_ids: "{{ project.account_ids | default([]) }}"
+  register: ec2_build_ami
+  with_items: "{{ ec2_build.instance_ids }}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Show ami details
+  debug: var=ec2_build_ami
+  tags:
+    - ami
+    - ami-finish
+
+- name: Create EBS Snapshot
+  ec2_snapshot:
+    instance_id: "{{build.ami.instance_id}}"
+    device_name: "{{ami_start[ec2_prefix].volume.device_name}}"
+    snapshot_tags: "{{ami_finish_tags}}"
+    description: "{{ami_finish_base_tags['Name']}}"
+    region: "{{build.ami.region}}"
+    wait: yes
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: ec2_build_ebs_snapshot
+  when: "{{ ami_start is defined and ami_start[ec2_prefix].volume is defined }}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Show EBS snapshot details
+  debug: var=ec2_build_ebs_snapshot
+  tags:
+    - ami
+    - ami-finish
+
+- name: Set output facts
+  set_fact:
+    ec2_build_ami: "{{ ec2_build_ami }}"
+  tags:
+    - ami
+    - ami-finish
+
+- name: Delete the buildbox
+  ec2:
+    state: absent
+    instance_ids: "{{build.terminate.instance_id}}"
+    region: "{{ build.terminate.region }}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  tags:
+    - ami
+    - ami-finish

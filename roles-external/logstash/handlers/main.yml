@@ -1,0 +1,5 @@
+---
+- name: restart logstash
+  service: name=logstash state=restarted
+  tags: logstash
+  when: update is defined and update == true or cloud != 'aws'

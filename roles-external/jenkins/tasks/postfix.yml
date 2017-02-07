@@ -1,0 +1,30 @@
+---
+- name: Remove send mail if present
+  yum: name=sendmail state=absent
+  tags:
+    - jenkins
+    - jenkins-postfix
+
+- name: Remove exim
+  yum: name=exim state=absent
+  tags:
+    - jenkins
+    - jenkins-postfix
+
+- name: Install postfix
+  yum: name=postfix state=present
+  tags:
+    - jenkins
+    - jenkins-postfix
+
+- name: Copy postfix configuration
+  template: src=postfix.j2 dest=/etc/postfix/main.cf
+  tags:
+    - jenkins
+    - jenkins-postfix
+
+- name: Start/Restart postfix service
+  service: name=postfix enabled=true state=restarted
+  tags:
+    - jenkins
+    - jenkins-postfix

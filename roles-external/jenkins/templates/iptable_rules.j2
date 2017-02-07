@@ -1,0 +1,15 @@
+# Jenkins rules - mgmt network
+-A INPUT -p tcp -m state --state NEW -s 172.21.0.0/28 -m tcp --dport 443 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -s 172.21.0.16/28 -m tcp --dport 443 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -s 172.21.0.32/28 -m tcp --dport 443 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -s 172.20.128.0/23 -m tcp --dport 443 -j ACCEPT
+# Elb - ssh
+-A INPUT -p tcp -m state --state NEW -s 172.21.0.64/27 -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -s 172.21.0.96/27 -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -s 172.21.0.128/27 -m tcp --dport 22 -j ACCEPT
+# Elb - https
+-A INPUT -p tcp -m state --state NEW -s 172.21.0.64/27 -m tcp --dport 443 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -s 172.21.0.96/27 -m tcp --dport 443 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -s 172.21.0.128/27 -m tcp --dport 443 -j ACCEPT
+
+

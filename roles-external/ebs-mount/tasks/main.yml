@@ -1,0 +1,20 @@
+---
+- name: Mount EBS volume with configuration to mount on boot
+  mount:
+    name: "{{ebs_mount_point}}"
+    src: "{{ebs_mount_device}}"
+    fstype: "{{ebs_mount_filesystem}}"
+    opts: "{{ebs_mount_opts}}"
+    state: mounted
+
+- file:
+    path: "{{ebs_mount_point}}"
+    state: directory
+    mode: "{{ebs_mount_mode}}"
+    owner: "{{ebs_mount_owner_name}}"
+    group: "{{ebs_mount_group_name}}"
+    recurse: yes
+
+
+
+

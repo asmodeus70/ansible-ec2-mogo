@@ -1,0 +1,3 @@
+---
+route53_add_recordset_value: "{{ elb_facts.elbs.0.dns_name }}"
+route53_add_recordset_type: CNAME

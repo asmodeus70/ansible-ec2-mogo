@@ -1,0 +1,23 @@
+---
+- name: Create ASG Scheduled Action
+  asg_scheduled_action:
+    region: "{{aws_region}}"
+    asg_name: "{{asg_action_shutdown_asg_name}}"
+    name: "{{asg_action_shutdown_name}}"
+    cron: "{{asg_action_shutdown_cron}}"
+    min_size: "{{asg_action_shutdown_min_size}}"
+    max_size: "{{asg_action_shutdown_max_size}}"
+    desired_capacity: "{{asg_action_shutdown_desired_capacity}}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: asg_action_shutdown_result
+  tags:
+    - asg-action
+    - asg-scheduled-action
+
+- name: Dump ASG Scheduled Action creation result
+  debug: msg="{{asg_action_shutdown_result}}"
+  tags:
+    - asg-action
+    - asg-scheduled-action

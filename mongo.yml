@@ -1,28 +1,55 @@
 ---
+- include: "{{base_dir}}/prompts/deploy_prompts/all_app.yml"
 # create EC2 instances
 - hosts: localhost
   gather_facts: False
+  vars:
+    ec2_prefix: cbe-mongo
   vars_files:
     - vars/config.yml
-    - "regions/mongodb_{{ target_region }}_{{ deployment_group }}.yml"
+    - "regions/mongodb_eu-west-1_default-install.yml"
   roles:
-    - role: create_ec2_mongo_stack
+    - sts-start
+    - sts-continue
+    - subnets
+    - security-groups
+    - launch-config
+    - auto-scaling-group
+    - squid-profile-build
+    - { role: iptables, iptables_inbound_ports: [27017] }
+    - create_ec2_mongo_stack
 
 # configure the mongo hosts
 - hosts: mongo:mongo_leader
   gather_facts: False
   become: yes
+  vars:
+    ec2_prefix: cbe-mongo
   vars_files:
     - vars/config.yml
-    - "regions/mongodb_{{ target_region }}_{{ deployment_group }}.yml"
+    - "regions/mongodb_eu-west-1_default-install.yml"
   roles:
-    - role: install_mongo
+    - sts-start
+    - sts-continue
+    - launch-config
+    - auto-scaling-group
+    - squid-profile-build
+    - { role: iptables, iptables_inbound_ports: [27017] }
+    - install_mongo
 
 # initialize replication from the leader
 - hosts: mongo_leader
   gather_facts: False
+  vars:
+    ec2_prefix: cbe-mongo
   vars_files:
     - vars/config.yml
-    - "regions/mongodb_{{ aws_region }}_{{ deployment_group }}.yml"
+    - "regions/mongodb_eu-west-1_default-install.yml"
   roles:
+    - sts-start
+    - sts-continue
+    - launch-config
+    - auto-scaling-group
+    - squid-profile-build
+    - { role: iptables, iptables_inbound_ports: [27017] }
     - init_mongo_replication

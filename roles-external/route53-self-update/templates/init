@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# custom route53_update script. 
+# Updates AWS route53 with private IP from instance.
+# Dependencies: boto
+#
+# chkconfig: 345 80 90
+# description: route53_update scp-payment-batch
+# probe: true
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source the service variables 
+[[ -f {{route53_update_config.service_env}} ]] && . {{route53_update_config.service_env}}
+
+# Check for existence of .boto (jenkins user credentials)
+
+[ -f /root/.boto ] || echo "No boto credentials file found. Ensure instance is bootstrapped with AWS metadata service to obtain credentials."
+
+start() {
+	echo -n "Starting route53_update: "
+	/root/route53_update.sh &
+	
+	RETVAL=$?
+	return $RETVAL
+}
+
+# Possible paramaters
+case "$1" in
+	start)
+		start
+	;;
+	stop)
+		exit 0
+	;;
+	*)
+		echo "Usage: route53_update {start}"
+		exit 1
+	;;
+esac
+
+exit 0
+

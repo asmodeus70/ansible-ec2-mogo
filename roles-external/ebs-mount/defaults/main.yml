@@ -1,0 +1,8 @@
+---
+ebs_mount_device: /dev/xvdf
+#ebs_mount_point: ?
+ebs_mount_filesystem: xfs
+ebs_mount_opts: defaults,nofail
+ebs_mount_owner_name: root
+ebs_mount_group_name: root
+ebs_mount_mode: "0755"

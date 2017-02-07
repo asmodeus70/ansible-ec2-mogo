@@ -1,0 +1,23 @@
+---
+platform_subnets:
+  build:
+    jenkins:
+      eu-west-1:
+        - subnet-b2b65dea
+        - subnet-dee349ba
+        - subnet-b9dc03cf
+      eu-central-1: []
+  dev:
+    elb:
+      eu-west-1:
+        - subnet-e8a04bb0
+        - subnet-a31db6c7
+        - subnet-4ab06f3c
+      eu-central-1: []
+
+    ielb:
+      eu-west-1:
+        - subnet-7597662d
+        - subnet-76f94912
+        - subnet-77db7f01
+      eu-central-1: []

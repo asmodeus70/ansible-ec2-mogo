@@ -1,0 +1,28 @@
+{#
+
+helper macro to keep this file DRY
+usage:
+
+to open ports 4369,25672,5671 (tcp) from source {{network_be}}.24/29
+{{ open_ports(network_be + ".24/29","4369,25672,5671","tcp") }}
+
+and for multiple source_segments, bit ugly, but works.
+{% if network_fe is defined %}
+{{ open_ports(network_be + '.24/29,' + network_fe + '.8/29', "80,443",'tcp) }}
+{% else %}
+{{ open_ports(network_be + '.24/29, "80,443",'tcp) }}
+{% endif %}
+
+#}
+
+{% macro open_ports(source_segments, ports, protocol) %}
+{%  for segment in source_segments.split(',') %}
+{%    for port in ports.split(',') %}
+-A INPUT -p {{ protocol }} -m state --state NEW -s {{segment}}  -m {{ protocol }} --dport {{ port }} -j ACCEPT
+{# always open access from network_openvpn #}
+-A INPUT -p {{ protocol }} -m state --state NEW -s {{network_openvpn}} -m {{ protocol }} --dport {{ port }} -j ACCEPT
+-A INPUT -p {{ protocol }} -m state --state NEW -s {{network_openvpn_clients}} -m {{ protocol }} --dport {{ port }} -j ACCEPT
+{%    endfor %}
+{%  endfor %}
+{% endmacro %}
+

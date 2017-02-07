@@ -1,0 +1,14 @@
+---
+- name: Deploy logstash app configuration
+  template:
+    src=logstash.conf
+    dest="/etc/logstash/conf.d/15-{{app_name}}.conf"
+  tags:
+    - logstash
+
+- name: Set directory permissions to 755
+  file:
+    dest="/var/log/{{app_name}}"
+    mode=0755
+    state=directory
+  tags: logstash

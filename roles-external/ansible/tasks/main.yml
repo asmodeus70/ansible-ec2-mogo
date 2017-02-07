@@ -1,0 +1,7 @@
+---
+- name: Install ansible
+  shell: umask 0022; pip install {{item}}==2.2.1.0
+  with_items:
+    - ansible
+  tags: ansible
+

@@ -1,0 +1,21 @@
+---
+platform_route53:
+  zones:
+    build:
+      zone_id: Z20HKNXRVNYPS5
+    dev:
+      zone_id: ZQ2185JBGN7LX
+    test:
+      zone_id: Z2CMQAF8M81EV0
+    int:
+      zone_id: Z27DJEUA4TPB22
+    uat:
+      zone_id: ZHJ437FBGP8P3
+    mgmt:
+      zone_id: Z367XTO3P0HDWU
+    perf:
+      zone_id: Z1MED21OH0MAF5
+    preprod:
+      zone_id: Z2J00OSRUG6ZI7
+    prod:
+      zone_id: Z1D9BQ2549QBSW

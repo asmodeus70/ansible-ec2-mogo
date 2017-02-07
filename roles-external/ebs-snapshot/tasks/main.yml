@@ -1,0 +1,52 @@
+---
+- name: Lookup EBS snapshot source instance
+  ec2_remote_facts:
+    filters:
+      "tag:Name": "{{deploy_env}}-{{ec2_prefix}}-*"
+    region: "{{aws_region}}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: ebs_snapshot_source_lookup_result
+  when: "{{ebs_snapshot_instance_id is undefined}}"
+  tags:
+    - ebs-snapshot
+
+- name: Debug result from EBS snapshot source instance lookup
+  debug: var=ebs_snapshot_source_lookup_result
+  when: "{{ebs_snapshot_instance_id is undefined}}"
+  tags:
+    - ebs-snapshot
+
+- name: Set EBS snapshot source instance identifier from lookup
+  set_fact:
+    ec2_snapshot_instance_id: "{{ebs_snapshot_source_lookup_result.instances[0].id}}"
+  when: "{{ebs_snapshot_instance_id is undefined}}"
+  tags:
+    - ebs-snapshot
+
+- name: Set EBS snapshot source instance identifier from ebs_snapshot_instance_id var
+  set_fact:
+    ec2_snapshot_instance_id: "{{ebs_snapshot_instance_id}}"
+  when: "{{ebs_snapshot_instance_id is defined}}"
+  tags:
+    - ebs-snapshot
+
+- name: Create EBS Snapshot
+  ec2_snapshot:
+    instance_id: "{{ec2_snapshot_instance_id}}"
+    device_name: "{{ebs_snapshot_device_name}}"
+    snapshot_tags:
+      Environment: "{{deploy_env}}"
+      Service: "{{project.service_id}}"
+      Project: "{{project.name}}"
+      Name: "{{deploy_env}}-{{ec2_prefix}}-{{timestamp.stdout}}"
+    description: "{{ec2_prefix}}-{{timestamp.stdout}}"
+    region: "{{aws_region}}"
+    wait: yes
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: ebs_snapshot_result
+  tags:
+    - ebs-snapshot

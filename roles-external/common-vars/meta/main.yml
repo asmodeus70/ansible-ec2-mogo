@@ -1,0 +1,17 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: cpcundill
+  description: Sets variables that are common to many roles, including ec2_prefix and timestamp.
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: Amazon
+      versions:
+        - all
+  galaxy_tags:
+    - development
+    - packaging
+    - app

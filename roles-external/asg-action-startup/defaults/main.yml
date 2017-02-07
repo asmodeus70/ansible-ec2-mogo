@@ -1,0 +1,6 @@
+---
+asg_action_startup_asg_name: "{{deploy_env}}-{{ec2_prefix}}-{{blue_green}}"
+asg_action_startup_cron: "0 6 * * MON-FRI"
+asg_action_startup_min_size: "{{ ec2_asg[deploy_env][ec2_prefix].min_size }}"
+asg_action_startup_max_size: "{{ ec2_asg[deploy_env][ec2_prefix].max_size }}"
+asg_action_startup_desired_capacity: "{{ ec2_asg[deploy_env][ec2_prefix].desired_capacity }}"

@@ -1,0 +1,4 @@
+---
+asg_name: "{{deploy_env}}-{{ec2_prefix}}-{{blue_green}}"
+asg_launch_config_name: "{{ deploy_env }}-{{ ec2_prefix }}-{{timestamp.stdout}}-{{blue_green}}"
+asg_wait_timeout: 600

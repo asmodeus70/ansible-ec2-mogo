@@ -1,0 +1,28 @@
+---
+
+# prevents this file from being executed multiple times when there aren't any
+# changes.
+#
+# we set a 'revision number' to /etc/ansible_fact_login_revision at the end of
+# the play, and only execute these steps if the revision number doesn't match
+# what is currently set.
+#
+- name: gather ssg_fstab_revision fact
+  shell: cat /etc/ansible_fact_ssg_fstab_revision || echo 0
+  register: ansible_fact_ssg_fstab_revision
+
+- name: "Healthcheck recommendation on /dev/shm"
+  lineinfile:
+    dest=/etc/fstab
+    line='tmpfs                   /dev/shm                tmpfs   nodev,noexec,nosuid        0 0'
+    regexp='^tmpfs                   /dev/shm                tmpfs   defaults        0 0'
+  when:
+    ansible_fact_ssg_fstab_revision.stdout_lines != "{{ssg_fstab_revision}}"
+  register: fstab
+
+- name: remount /dev/shm if changed
+  command: mount -o remount /dev/shm
+  when: fstab.changed
+
+- name: set ssg_fstab_revision
+  shell: "echo {{ssg_fstab_revision}} > /etc/ansible_fact_ssg_fstab_revision"

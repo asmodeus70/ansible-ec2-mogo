@@ -1,0 +1,6 @@
+---
+deploy_prompts:
+  - aws_region
+  - deploy_env
+  - blue_green
+  - mfa_token

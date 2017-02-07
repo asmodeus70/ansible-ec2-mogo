@@ -1,0 +1,4 @@
+---
+dependencies:
+  - { role: 'java-openjdk-8' }
+  - { role: 'repo-logstash' }

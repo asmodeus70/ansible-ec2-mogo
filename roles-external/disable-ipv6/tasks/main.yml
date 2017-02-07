@@ -1,0 +1,10 @@
+---
+- name: Disable ipv6 on all interfaces
+  copy:
+    src=01-disable-ipv6.conf
+    dest=/etc/sysctl.d
+    owner=root
+    group=root
+    mode=0600
+    
+  tags: disable-ipv6

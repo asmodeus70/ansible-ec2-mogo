@@ -1,0 +1,34 @@
+---
+- name: Install the necessary devel libraries
+  yum: name="{{item}}" state=present enablerepo=rhui-REGION-rhel-server-optional
+  with_items:
+    - ruby-devel
+    - python-devel
+    - libffi-devel
+    - openssl-devel
+    - libxml2-devel
+    - libxslt-devel
+    - libcurl-devel
+    - libattr-devel
+    - '@Development tools'
+  tags:
+   - pip-devel
+  
+- name: Upgrade pip 
+  shell: umask 0022; pip install -U pip
+  tags:
+   - pip-devel
+
+- name: Upgrade the setuptools first
+  shell: umask 0022; pip install -U setuptools
+  environment:
+    PYCURL_SSL_LIBRARY: nss
+  tags:
+   - pip-devel
+
+- name: Upgrade all pip installs
+  shell: umask 0022; pip list --local | tr '\t' ' ' | tr -s ' ' | cut -d' ' -f1 | grep -v setuptools| xargs pip install -U
+  environment:
+    PYCURL_SSL_LIBRARY: nss
+  tags:
+   - pip-devel

@@ -1,0 +1,12 @@
+---
+- name: Gather ELB facts
+  ec2_elb_facts:
+    region: "{{aws_region}}"
+    names: "{{elb_facts_name}}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: elb_facts
+  tags:
+    - elb-facts
+    - route53-add

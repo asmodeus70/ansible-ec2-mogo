@@ -1,0 +1,7 @@
+---
+- name: update packages
+  yum:
+    name=*
+    state=latest
+  tags:
+    - yum

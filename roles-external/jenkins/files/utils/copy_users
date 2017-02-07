@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -o nounset
+
+readonly TARGET_DIR="$(dirname ${BASH_SOURCE[0]})/users"
+
+[[ -d $TARGET_DIR ]] || mkdir $TARGET_DIR || { echo "Failed to create the target $TARGET_DIR"; exit 1; }
+rm -f $TARGET_DIR/*
+for curr_user in $(sudo ls -1 ~jenkins/users); do 
+  sudo cp ~jenkins/users/$curr_user/config.xml $TARGET_DIR/$curr_user; 
+done
+sudo chown ec2-user:ec2-user $TARGET_DIR/*

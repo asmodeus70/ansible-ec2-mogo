@@ -1,0 +1,18 @@
+---
+dependencies:
+  - custom-filters
+
+galaxy_info:
+  author: cpcundill
+  description: Installs and configures an app from a Yum repository on RHEL 7
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: Amazon
+      versions:
+        - all
+  galaxy_tags:
+    - development
+    - packaging
+    - app

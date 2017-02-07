@@ -1,0 +1,5 @@
+---
+- name: Copy squid profile settings
+  template: src=squid_proxy.sh dest=/etc/profile.d/squid_proxy.sh mode=0644
+  tags:
+    - squid-profile-build

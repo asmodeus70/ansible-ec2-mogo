@@ -1,0 +1,17 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: chris.cundill
+  description: Snapshot an EBS volume
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: Amazon
+      versions:
+        - all
+  galaxy_tags:
+    - vars
+
+  

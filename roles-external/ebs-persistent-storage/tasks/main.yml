@@ -1,0 +1,16 @@
+---
+- name: Create the script directory
+  file: path={{ebs_volume_script_dir}} state=directory mode=0755
+  tags: ebs-persistent-storage
+  
+- name: deploy python script
+  template: src="{{ebs_volume_script}}" dest="{{ebs_script_location}}" mode=0755
+  tags: ebs-persistent-storage
+
+- name: Copy the systemd script in the relevant directory
+  template: src="{{ebs_volume_service}}" dest="/etc/systemd/system/{{ebs_volume_service}}"
+  tags: ebs-persistent-storage
+
+- name: Enable the service
+  service: name="{{ebs_volume_service}}" enabled=true
+  tags: ebs-persistent-storage

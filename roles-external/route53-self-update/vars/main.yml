@@ -1,0 +1,7 @@
+---
+route53_update:
+  logfile_path: "{{ aws_route53[ec2_prefix] | attr('logfile_path') | default('/var/log/route53_update.log') }}"
+  record_set:
+    name: "{{aws_route53[ec2_prefix].name}}"
+    type: "{{aws_route53[ec2_prefix].type}}"
+    ttl_seconds: "{{ aws_route53[ec2_prefix] | attr('ttl_seconds') | default(300) }}"

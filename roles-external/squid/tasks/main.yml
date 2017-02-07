@@ -1,0 +1,24 @@
+---
+- name: install squid
+  yum:
+    name=squid
+    state=latest
+  notify: restart squid
+  tags:
+    - squid
+
+- name: deploy configuration file
+  template:
+    src=squid.conf
+    dest=/etc/squid/squid.conf
+  notify: restart squid
+  tags:
+    - squid
+
+- name: enable and start squid
+  service:
+    name=squid
+    enabled=yes
+    state=started
+  tags:
+    - squid

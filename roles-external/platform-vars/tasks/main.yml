@@ -1,0 +1,11 @@
+---
+- name: Include platform variables
+  include_vars: "{{ item }}"
+  with_items:
+    - "vpcs.yml"
+    - "route53.yml"
+    - "elasticsearch.yml"
+    - "build.yml"
+    - "subnets.yml"
+    - "certificates.yml"
+  tags: [always]

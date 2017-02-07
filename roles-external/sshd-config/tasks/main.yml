@@ -1,0 +1,14 @@
+---
+# SP-1667.
+- name: Update sshd_config with list of private HostKeys
+  lineinfile: 
+      dest: /etc/ssh/sshd_config
+      line: "{{ item.line }}"
+  with_items:
+      - { line: '# HostKeys for protocol version 2' }
+      - { line: 'HostKey /etc/ssh/ssh_host_rsa_key' }
+      - { line: '#HostKey /etc/ssh/ssh_host_dsa_key' }
+      - { line: 'HostKey /etc/ssh/ssh_host_ecdsa_key' }
+      - { line: 'HostKey /etc/ssh/ssh_host_ed25519_key' }
+  notify: restart sshd
+  tags: sshd

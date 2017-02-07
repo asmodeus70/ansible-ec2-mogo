@@ -1,0 +1,115 @@
+---
+- name: Copy the jenkins repo
+  template: src=jenkins.repo dest=/etc/yum.repos.d/jenkins.repo
+  tags: jenkins
+
+- name: Install jenkins rpm key
+  rpm_key: state=present key='https://jenkins-ci.org/redhat/jenkins-ci.org.key'
+  tags: jenkins
+
+- name: Install the packages
+  yum: name="{{item}}" state=present enablerepo=rhui-REGION-rhel-server-optional
+  with_items:
+    - jenkins
+    - git
+    - rpm-build
+  tags: jenkins
+
+- name: Install the required gems
+  shell: gem uninstall --all --executables {{item}} && gem install {{item}} --no-rdoc --no-ri --clear-sources --both
+  with_items:
+    - fpm
+    - bundler
+  sudo_user: jenkins
+  tags: jenkins
+
+- name: Copy the fpm and other tools into the /usr/bin directory and change the permissions
+  shell: "{{ item }}"
+  with_items:
+    - install -m 0755 ~jenkins/.gem/ruby/gems/fpm*/bin/fpm /usr/bin
+    - install -m 0755 ~jenkins/.gem/ruby/gems/bundler*/bin/* /usr/bin
+
+- name: Get the maven package
+  get_url: url="{{maven_url}}" dest="{{maven_tmp}}"
+  tags: jenkins
+
+- name: Create maven destination
+  file: path="{{maven_dest}}" state=directory mode=755
+  tags: jenkins
+
+- name: Unpack the maven
+  shell: umask 0022; tar zxf "{{maven_tmp}}" -C "{{maven_dest}}"
+  tags: jenkins
+
+- name: Modify the jenkins user to have a shell (this is to install fpm and other compilation requirements)
+  user: name=jenkins shell=/bin/bash
+  tags: jenkins
+
+- name: Copy the profiles
+  template: src="{{item}}" dest="/etc/profile.d/{{item}}" mode=0644
+  with_items:
+    - aliases.sh
+    - zz_maven.sh
+  tags: jenkins
+
+- name: Get the ec2-user
+  command: echo ~ec2-user
+  register: ec2_home_out
+  tags: jenkins
+
+- set_fact:
+    ec2_user_home: "{{ec2_home_out.stdout}}"
+  tags: jenkins
+
+# Srini:  After implementing the proper mechanism to check in 
+#         the configurations this block can be removed.
+# -----------------------------------------------------------
+- name: Create the utils directory
+  file: path="{{ec2_user_home}}/utils" state=directory owner=ec2-user group=ec2-user mode=755
+  tags: jenkins
+
+- name: Copy the utilities
+  copy: src="{{item}}" dest="{{ec2_user_home}}/utils/{{item|basename}}" owner=ec2-user group=ec2-user mode=0755
+  with_fileglob:
+    - ../files/utils/*
+  tags: jenkins
+# -----------------------------------------------------------
+
+- name: Create link to the maven executable in the bin area
+  file: state=link src="{{maven_dest}}/{{maven_version}}/bin/mvn" dest="/usr/sbin/mvn"
+  tags: jenkins
+
+- name: Change te umask for jenkis service
+  lineinfile: dest=/etc/sysconfig/jenkins line="umask 0022"
+  tags: jenkins
+
+- name: Copy the selinux policy files
+  copy: src="selinux_module/{{item}}" dest="/tmp/{{item}}"
+  with_items:
+    - nginxlocalconf.pp
+    - nginxlocalconf.te
+  tags:
+    - nexus
+
+- name: Install the selinux modules to allow nginx proxy
+  command: /sbin/semodule -i nginxlocalconf.pp
+  args: 
+    chdir: /tmp
+  tags:
+    - nexus
+
+- name: Remove the selinux policy files
+  file: path="/tmp/{{item}}" state=absent
+  with_items:
+    - nginxlocalconf.pp
+    - nginxlocalconf.te
+  tags:
+    - nexus
+
+- name: Enable and start jenkins
+  service: name=jenkins state=restarted enabled=true
+  tags: jenkins
+
+- name: Include postfix
+  include: postfix.yml
+  tags: jenkins

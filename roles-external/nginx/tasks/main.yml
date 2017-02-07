@@ -1,0 +1,118 @@
+---
+- name: install nginx
+  yum: name=http://nginx.org/packages/mainline/rhel/7/x86_64/RPMS/nginx-1.9.5-1.el7.ngx.x86_64.rpm
+    state=present
+  tags: nginx
+  # Don't install it when doing update
+  when: update is not defined or update != true
+
+- name: ensure ssl directory exists
+  file:
+    path=/etc/nginx/ssl
+    state=directory
+  tags: nginx
+
+- name: replace 404.html
+  copy: src=default.html dest=/usr/share/nginx/html/404.html
+  tags: nginx
+
+- name: replace 50x.html
+  copy: src=default.html dest=/usr/share/nginx/html/50x.html
+  tags: nginx
+
+- name: replace index.html
+  copy: src=default.html dest=/usr/share/nginx/html/index.html
+  tags: nginx
+
+- name: remove nginx-logo.png
+  file: path=/usr/share/nginx/html/nginx-logo.png state=absent
+  tags: nginx
+
+- name: remove poweredby.png
+  file: path=/usr/share/nginx/html/poweredby.png state=absent
+  tags: nginx
+
+- name: remove default config
+  file: path=/etc/nginx/conf.d/default.conf state=absent
+  tags: nginx
+
+- name: remove default vhost config
+  file: path=/etc/nginx/conf.d/virtual.conf state=absent
+  tags: nginx
+
+- name: remove ssl config
+  file: path=/etc/nginx/conf.d/ssl.conf state=absent
+  tags: nginx
+
+- name: deploy nginx config file
+  copy:
+    src=nginx.conf
+    dest=/etc/nginx/nginx.conf
+  tags: nginx
+
+- name: ensure streams directory exists
+  file:
+    path=/etc/nginx/conf.d/streams
+    state=directory
+    owner=nginx
+    group=nginx
+  tags: nginx
+
+- name: start nginx on boot
+  tags: nginx
+  service: name=nginx enabled=yes
+
+- name: logstash access
+  acl:
+    name=/var/log/nginx
+    entity=logstash
+    etype=user
+    permissions="r"
+    default=yes
+    state=present
+  when: has_logstash is defined
+  tags:
+    - nginx
+    - logstash
+    - logstash-sqs
+
+# Might be a quick fix
+# Note: The nginx rpm creates empty files in the /var/log/nginx dir
+#       The above task sets the default acl only. Even with a recursive 
+#       flag it does not set the file permissions (thats how the acl 
+#       command itself would work). Therefore the following task is needed
+#       for the files in the log directory.
+- name: logstash access for the log files
+  acl:
+    name=/var/log/nginx
+    entity=logstash
+    etype=user
+    permissions="r"
+    state=present
+    recursive=yes
+  when: has_logstash is defined
+  tags:
+    - nginx
+    - logstash
+    - logstash-sqs
+
+- name: logstash configuration
+  template:
+    src=logstash.conf
+    dest=/etc/logstash/conf.d/11-nginx.conf
+    owner=logstash
+    group=logstash
+  when: has_logstash is defined
+  tags:
+    - nginx
+    - logstash
+    - logstash-sqs
+
+- name: monit configuration
+  copy:
+    src=monit.conf
+    dest=/etc/monit.d/nginx.conf
+  when: has_monit is defined
+  tags:
+    - nginx
+    - monit

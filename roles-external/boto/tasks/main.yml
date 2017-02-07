@@ -1,0 +1,10 @@
+---
+- name: install boto
+  shell: umask 022; pip install boto
+  tags:
+    - boto
+
+- name: install boto3
+  shell: umask 022; pip install boto3
+  tags:
+    - boto

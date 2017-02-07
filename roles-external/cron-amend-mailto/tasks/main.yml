@@ -1,0 +1,13 @@
+---
+- name: Amend MAILTO=.* to MAILTO= in crontab and and anacrontab
+  lineinfile:
+        dest="{{ item.file }}"
+        state=present
+        regexp="{{ item.regexp }}"
+        line="{{ item.line }}"
+        backup=yes
+        backrefs=yes
+  with_items:
+        - { file: '/etc/crontab', regexp: '^(MAILTO=)(.*)$', line: '\1' }
+        - { file: '/etc/anacrontab', regexp: '^(MAILTO=)(.*)$', line: '\1' }
+

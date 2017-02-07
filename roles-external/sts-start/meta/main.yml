@@ -1,0 +1,20 @@
+---
+dependencies:
+  - { role: deploy-prompts, deploy_prompts: [aws_region, mfa_token] }
+  - platform-vars
+  - { role: sts-session, when: "(sts_session_role is not defined and mfa_token != '')" } 
+
+galaxy_info:
+  author: cpcundill
+  description: Initiates STS process
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: Amazon
+      versions:
+        - all
+  galaxy_tags:
+    - development
+    - packaging
+    - app

@@ -1,0 +1,16 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: chris.cundill
+  description: Installs and configures clamav as a service.  Manages selinux to allow system scanning.  Uses freshclam to keep virus database current.
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: Amazon
+      versions:
+        - all
+  galaxy_tags:
+    - users
+    - security

@@ -1,0 +1,6 @@
+---
+- name: install unzip
+  yum:
+    name=unzip
+    state=latest
+  tags: unzip

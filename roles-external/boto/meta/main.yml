@@ -1,0 +1,17 @@
+---
+dependencies:
+  - { role: 'pip' }
+
+galaxy_info:
+  author: chris.cundill
+  description: Installs boto - the AWS SDK for Python.
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: EL
+      versions:
+        - 7
+  galaxy_tags:
+    - boto
+    - aws-sdk-python

@@ -1,0 +1,45 @@
+---
+- name: grant access to log files
+  acl:
+    name={{item}}
+    entity=logstash
+    etype=user
+    permissions="r"
+    state=present
+  with_items:
+    - /var/log/messages
+    - /var/log/maillog
+    - /var/log/secure
+    - /var/log/yum.log
+    - /var/log/cron
+    - /var/log/spooler
+    - /var/log/monit.log
+    - /var/log/haproxy
+  ignore_errors: true
+  tags:
+    - elk
+    - logstash
+    - logstash-sqs
+
+- name: deploy logstash syslog input configuration
+  template:
+    src=01-syslog.conf
+    dest=/etc/logstash/conf.d/01-syslog.conf
+    owner=logstash
+    group=logstash
+  notify: restart logstash
+  tags:
+    - elk
+    - logstash
+    - logstash-sqs
+
+- name: deploy replacement logrotate
+  template:
+    src=logrotate.conf
+    dest=/etc/logrotate.d/syslog
+    mode=644
+  tags:
+    - elk
+    - logstash
+    - logstash-sqs
+    - logrotate

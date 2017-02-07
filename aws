@@ -1,0 +1,18 @@
+#!/bin/bash
+
+export BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+echo $BASE_DIR
+
+export PATH=/usr/local/bin:$PATH
+
+export PYTHONUNBUFFERED=1
+
+#TODO: Create a switch so we dont have to fetch galaxy roles every time.
+#if [[ $1 == "--no-roles"]] then;
+#
+#fi
+
+ansible-playbook -i inventory/none -vvvv install_galaxy_roles.yml
+
+ansible-playbook --vault-password-file=~/.vault -i ./inventory/none --extra-vars "build_box_user=$USER" --extra-vars "build_branch=$(git rev-parse --abbrev-ref HEAD)" --extra-vars "base_dir=${BASE_DIR}" -vvvv mongo-in-vpc.yml

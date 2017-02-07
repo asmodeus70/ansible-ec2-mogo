@@ -1,0 +1,15 @@
+---
+- name: Add sonarqube yum repo
+  copy:
+    src: sonar.repo
+    dest: /etc/yum.repos.d/sonar.repo
+
+- name: Install sonar rpm
+  become: yes
+  become_user: root
+  yum: name=sonar
+
+- name: Enable sonar service
+  become: yes
+  become_user: root
+  service: name=sonar enabled=yes

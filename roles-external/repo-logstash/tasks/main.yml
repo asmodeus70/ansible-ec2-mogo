@@ -1,0 +1,8 @@
+---
+- name: deploy repo file
+  copy:
+    src=yum.repo
+    dest=/etc/yum.repos.d/logstash.repo
+  tags:
+    - yum
+    - logstash

@@ -1,0 +1,12 @@
+---
+- name: deploy logstash sqs output configuration
+  template:
+    src=49-sqs-output.conf
+    dest=/etc/logstash/conf.d/49-sqs-output.conf
+    owner=logstash
+    group=logstash
+  notify: restart logstash
+  tags:
+    - elk
+    - logstash
+    - logstash-sqs

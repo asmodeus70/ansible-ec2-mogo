@@ -1,0 +1,72 @@
+---
+- name: Set target package, assuming latest version
+  set_fact: { "app_{{app_package.name|slugify}}_package":"{{app_package.name}}" }
+  when: "{{ app_package.version == 'latest' }}"
+
+- name: Set target package with specific version
+  set_fact: { "app_{{app_package.name|slugify}}_package":"{{app_package.name}}-{{app_package.version}}*" }
+  when: "{{ app_package.version != 'latest' and app_package.version|contains('SNAPSHOT$') }}"
+
+- name: Set target package with specific version
+  set_fact: { "app_{{app_package.name|slugify}}_package":"{{app_package.name}}-{{app_package.version}}" }
+  when: "{{ app_package.version != 'latest' and app_package.version|contains('SNAPSHOT$') == false }}"
+
+- name: Install app rpm
+  become: yes
+  become_user: root
+  yum:
+    name: "{{hostvars[groups['memory_hosts'][0]]['app_' + app_package.name|slugify + '_package']}}"
+
+- name: Get installed app RPM version
+  shell: yum info installed "{{app_package.name}}" | grep 'Version' | sed -E 's/Version\s*\:\s{1}([A-Z0-9.]*)/\1/'
+  register: rpm_version_output
+
+- name: Get installed app RPM release
+  shell: yum info installed "{{app_package.name}}" | grep 'Release' | sed -E 's/Release\s*\:\s{1}([A-Z0-9]*)/\1/'
+  register: rpm_release_output
+  when: "{{ app.repository == 'snapshots' }}"
+
+- name: Set the app_installed_version fact to exclude RPM release field since this is a release version
+  set_fact: {"app_{{app_package.name|slugify}}_installed_version":"{{rpm_version_output.stdout}}"}
+  when: "{{ app.repository == 'releases' }}"
+
+- name: Set the app_installed_version fact to include RPM release field since this is a snapshot version
+  set_fact: {"app_{{app_package.name|slugify}}_installed_version":"{{rpm_version_output.stdout}}-{{rpm_release_output.stdout}}"}
+  when: "{{ app.repository == 'snapshots' }}"
+
+- name: Append to the app_installed_versions array
+  set_fact:
+    app_installed_versions: "{{ app_installed_versions|default([]) + [{'name': app_package.name, 'version': hostvars[groups['memory_hosts'][0]]['app_' + app_package.name|slugify + '_installed_version']}] }}"
+
+- debug: msg="{{app_installed_versions}}"
+
+- name: Enable app service
+  become: yes
+  become_user: root
+  service: name="{{app_package.name}}" enabled=yes
+
+- name: Set var for config file template within role
+  set_fact: { "config_file_role_path_{{app_package.name|slugify}}":"{{base_dir}}/roles/{{app_package.name}}/templates/{{app_package.config_file}}" }
+
+- name: Check existence of config file template within role
+  become: no
+  local_action:
+    module: stat
+    path: "{{hostvars[groups['memory_hosts'][0]]['config_file_role_path_' + app_package.name|slugify]}}"
+  register: config_file_check
+  when: "{{ app_package.config_file != 'none' }}"
+
+- name: Set final config file template path
+  set_fact: { "{{app_package.name|slugify}}_config_file_template_path":"{{hostvars[groups['memory_hosts'][0]]['config_file_role_path_' + app_package.name|slugify]}}" }
+  when: "{{ app_package.config_file != 'none' and config_file_check.stat.exists }}"
+
+- name: Set final config file template path
+  set_fact: { "{{app_package.name|slugify}}_config_file_template_path":"{{base_dir}}/app_config/{{app_package.config_file}}" }
+  when: "{{ app_package.config_file != 'none' and config_file_check.stat.exists == false }}"
+
+- name: Deploy app config file
+  template:
+    src: "{{hostvars[groups['memory_hosts'][0]][app_package.name|slugify + '_config_file_template_path']}}"
+    dest: "{{app_config_destination}}"
+    mode: 0644
+  when: "{{ app_package.config_file != 'none' }}"

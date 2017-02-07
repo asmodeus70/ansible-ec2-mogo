@@ -1,0 +1,40 @@
+---
+- name: install logstash
+  yum:
+    name=logstash
+    state=latest
+  notify: restart logstash
+  tags: logstash
+
+- name: load variables
+  include_vars: "{{deploy_env}}.yml"
+  when: deploy_env is defined and deploy_env != ''
+  tags: logstash
+
+- name: logstash sysconfig
+  copy:
+    src: sysconfig
+    dest: /etc/sysconfig/logstash
+  tags:
+    - elk
+    - logstash
+
+- name: enable logstash
+  service:
+    name=logstash
+    enabled=yes
+    state=stopped
+  when: update is not defined or update != true
+  tags:
+    - elk
+    - logstash
+
+- name: logstash monit configuration
+  copy:
+    src=monit-logstash.conf
+    dest=/etc/monit.d/logstash.conf
+  when: has_monit is defined
+  tags:
+    - elk
+    - logstash
+    - monit

@@ -1,0 +1,14 @@
+[Unit]
+Description=Service to keep looking to mount the given ebs volume
+
+[Service]
+Type=idle
+# Include the environment profile to perform actions through squid
+EnvironmentFile=/etc/profile.d/squid_proxy.sh
+ExecStart={{ebs_script_location}}
+{# no need of monit #}
+# Automatically restart on abnormal exit
+Restart=on-abnormal
+
+[Install]
+WantedBy=multi-user.target

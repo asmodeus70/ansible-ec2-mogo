@@ -1,0 +1,11 @@
+---
+platform_certificates:
+  global: "arn:aws:acm:eu-west-1:392336992919:certificate/186ca3ec-b1ac-4b53-af8f-4cdd9214a560"
+  dev: "arn:aws:acm:eu-west-1:392336992919:certificate/88f33e95-6629-496a-b9ee-64d419ef9ef7"
+  test: "arn:aws:acm:eu-west-1:392336992919:certificate/5003c5ef-ced9-42d0-90e6-234a979a1865"
+  int: "arn:aws:acm:eu-west-1:392336992919:certificate/cf449918-2989-4b2b-937c-a8c9f3ae35c6"
+  uat: "arn:aws:acm:eu-west-1:392336992919:certificate/ef88bc52-b20e-4025-9781-7a242f88b873"
+  build: "arn:aws:acm:eu-west-1:392336992919:certificate/2958f441-7a1b-4a85-9a7e-d25ab7639b3f"
+  perf: "arn:aws:acm:eu-west-1:392336992919:certificate/5523d393-7c9a-4d6c-a6af-fad8a1565fe9"
+  preprod: "arn:aws:acm:eu-west-1:161773377830:certificate/19fb4c3e-400f-4d70-96d4-a04c904f2c2c"
+  prod: "arn:aws:acm:eu-west-1:870051222499:certificate/54ebb681-0060-46ed-86cc-e40c8d1adf8d"

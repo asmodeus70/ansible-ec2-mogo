@@ -1,0 +1,37 @@
+---
+- name: Create subnet
+  ec2_vpc_subnet:
+    state: present
+    vpc_id: "{{platform_vpcs[deploy_env].id}}"
+    region: "{{aws_region}}"
+    cidr: "{{item.cidr}}"
+    az: "{{item.az}}"
+    resource_tags:
+      Name: "{{item.name}}"
+      Logical-Name: "{{item.logical_name}}"
+      environment: "{{deploy_env}}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  async: 60
+  poll: 0
+  with_items: "{{ec2_subnets[deploy_env][ec2_prefix][aws_region]}}"
+  register: subnet_async_result
+  tags:
+    - subnets
+
+- name: Dump subnet_async_result
+  debug: msg={{subnet_async_result}}
+  tags:
+    - subnets
+
+- name: Wait for subnet creation
+  async_status:
+    jid: "{{item.ansible_job_id}}"
+  with_items: "{{subnet_async_result.results}}"
+  register: subnet_result
+  until: "{{subnet_result.finished}}"
+  retries: 30
+  delay: 2
+  tags:
+    - subnets

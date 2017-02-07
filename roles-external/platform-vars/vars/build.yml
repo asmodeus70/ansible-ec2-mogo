@@ -1,0 +1,19 @@
+---
+platform_build:
+  security_group:
+    eu-west-1: sg-760ab111
+    eu-central-1:
+  subnet:
+#    eu-west-1: subnet-268a617e
+    eu-west-1: subnet-5de74d39
+#    eu-west-1: subnet-d2d807a4
+    eu-central-1:
+  launch:
+    base_image_name: base
+    key_pair: scp1
+    instance_type: t2.small
+    assign_public_ip: no
+    tags:
+      type: buildbox
+      Environment: build
+      Service: 13

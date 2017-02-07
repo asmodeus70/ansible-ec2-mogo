@@ -1,0 +1,17 @@
+---
+# default vars for route53-update role
+route53_update_config:
+  metadata_service:
+    host: "169.254.169.254"
+    path: "/latest/meta-data/local-ipv4"
+  service_env: "/etc/profile.d/squid_proxy.sh"
+
+route53_update:
+  record_set:
+    zone_id:
+    zone:
+    name:
+    value:
+    type:
+    ttl_seconds: 300
+  logfile_path: "/var/log/route53_update.log"

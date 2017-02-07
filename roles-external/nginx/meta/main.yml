@@ -1,0 +1,16 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: chris.cundill
+  description: Installs and configures nginx according to DVLA requirements.
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: EL
+      versions:
+        - 7
+  galaxy_tags:
+    - nginx
+    - proxy

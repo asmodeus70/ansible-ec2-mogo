@@ -1,0 +1,12 @@
+---
+launch_extra_args:
+  launch:
+    owner: "392336992919"
+    region: "{{aws_region}}"
+    subnet_id: "{{ platform_build.subnet[aws_region] }}"
+    security_group_id: "{{ platform_build.security_group[aws_region] }}"
+    tags:
+      Name: "{{build_box_user}}-{{ec2_prefix}}-buildbox"
+      Service: "{{project.service_id}}"
+
+build: "{{ platform_build | combine(launch_extra_args, recursive=True) }}"

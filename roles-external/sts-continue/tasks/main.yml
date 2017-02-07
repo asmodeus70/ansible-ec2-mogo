@@ -1,0 +1,22 @@
+---
+- name: Switch to next account
+  sts_assume_role:
+    region: "{{aws_region}}"
+    role_arn: "arn:aws:iam::{{platform_vpcs[deploy_env].account_id}}:role/{{lookup('env','AWS_DVLA_ROLE')}}"
+    role_session_name: "Ansible"
+    security_token: "{{sts_session_role.sts_creds.session_token}}"
+    aws_access_key: "{{sts_session_role.sts_creds.access_key}}"
+    aws_secret_key: "{{sts_session_role.sts_creds.secret_key}}"
+  register: continue_assumed_role
+  when: platform_vpcs.build.account_id != platform_vpcs[deploy_env].account_id and mfa_token != ''
+  tags:
+    - always
+    - sts
+
+- name: Set STS Facts
+  set_fact:
+    sts_assumed_role: "{{continue_assumed_role}}"
+  when: continue_assumed_role.sts_creds is defined
+  tags:
+    - always
+    - sts

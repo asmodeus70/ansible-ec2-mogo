@@ -1,0 +1,6 @@
+---
+- name: Check {{item}} deploy prompts are defined
+  fail: msg="Deploy prompt {{item}} is missing"
+  when: "{{ hostvars['localhost'][item] is not defined}}"
+  with_items: "{{ deploy_prompts }}"
+  tags: [always]

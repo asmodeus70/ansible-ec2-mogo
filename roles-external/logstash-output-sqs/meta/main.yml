@@ -1,0 +1,4 @@
+---
+dependencies:
+  - { role: 'logstash' }
+  - { role: 'rsyslog' }

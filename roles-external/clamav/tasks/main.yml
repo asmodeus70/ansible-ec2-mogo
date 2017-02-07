@@ -1,0 +1,55 @@
+---
+- name: install clamav
+  yum:
+    name={{item}}
+    state=present
+  tags: clamav
+  with_items:
+    - clamav-data-empty
+    - clamav-update
+    - clamav-filesystem
+    - clamav
+    - clamav-scanner-systemd
+
+- name: update sebool
+  seboolean:
+    name=antivirus_can_scan_system
+    state=yes
+    persistent=yes
+  tags: clamav
+
+- name: deploy scan.conf
+  template:
+    src=scan.conf
+    dest=/etc/clamd.d/scan.conf
+  tags: clamav
+
+- name: Craete a sym link for the conf for the scan to run
+  file: src=/etc/clamd.d/scan.conf dest=/etc/clamd.conf state=link
+  tags: clamav
+
+- name: deploy freshclam.conf
+  template:
+    src=freshclam.conf
+    dest=/etc/freshclam.conf
+  tags: clamav
+  
+- name: Enable automatic database update
+  lineinfile: dest=/etc/sysconfig/freshclam regexp="^FRESHCLAM_DELAY"  state=absent
+
+- name: deploy freshclam service script
+  copy:
+    src=clam-freshclam.service
+    dest=/usr/lib/systemd/system/clam-freshclam.service
+  tags: clamav
+
+- name: enable freshclam service
+  service:
+    name=clam-freshclam
+    state=started
+    enabled=yes
+  tags: clamav
+
+- name: Enable and start the clamd service
+  service: name='clamd@scan.service' state=started enabled=yes
+  tags: clamav

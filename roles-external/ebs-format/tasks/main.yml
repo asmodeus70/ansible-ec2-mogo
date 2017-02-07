@@ -1,0 +1,22 @@
+---
+- name: Copy format-volume script
+  become: yes
+  template:
+    src: format-volume.sh
+    dest: /root/format-volume.sh
+    owner: root
+    mode: u=rwx
+  tags: ebs-format
+
+- name: Conditionally format the EBS volume
+  become: yes
+  command: /root/format-volume.sh
+  tags: ebs-format
+
+- name: Remove format-volume script
+  become: yes
+  file:
+    path: /root/format-volume.sh
+    state: absent
+  tags: ebs-format
+

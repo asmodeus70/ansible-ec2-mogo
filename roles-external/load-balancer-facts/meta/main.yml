@@ -1,0 +1,18 @@
+---
+dependencies:
+  - deploy-prompts
+
+galaxy_info:
+  author: cpcundill
+  description: Gathers Load Balancer facts
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: Amazon
+      versions:
+        - all
+  galaxy_tags:
+    - development
+    - packaging
+    - app

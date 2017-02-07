@@ -1,0 +1,2 @@
+---
+elb_facts_name: "{{deploy_env}}-{{ec2_elbs[ec2_prefix].name}}-{{blue_green}}"

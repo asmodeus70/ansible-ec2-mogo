@@ -1,0 +1,4 @@
+maven_version: "apache-maven-3.3.9"
+maven_url: "http://mirror.ox.ac.uk/sites/rsync.apache.org/maven/maven-3/3.3.9/binaries/{{maven_version}}-bin.tar.gz"
+maven_tmp: "/tmp/apache-maven.tgz"
+maven_dest: "/opt/apache-maven"

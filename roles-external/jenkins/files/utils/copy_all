@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -o nounset
+
+readonly ITEMS_TO_BACKUP=(
+  configs
+  jobs
+  plugins
+  users
+)
+
+readonly SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
+
+for curr_script in ${ITEMS_TO_BACKUP[@]}; do
+  $SCRIPT_DIR/copy_${curr_script} || echo "Failed to backup $curr_script" >&2
+done

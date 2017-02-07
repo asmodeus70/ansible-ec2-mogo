@@ -1,0 +1,7 @@
+---
+- name: Change default bash PS1 prompt
+  copy: content="export PS1=\"[\\u@${ENVIRONMENT}-{{aws_region}}-{{ec2_prefix}}:\\W]$ \"" dest=/etc/profile.d/user_prompt.sh mode=0644
+  tags:
+    - scp
+    - bash-prompt
+

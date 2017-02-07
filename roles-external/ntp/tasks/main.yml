@@ -1,0 +1,19 @@
+---
+- name: install ntp
+  yum:
+    name=ntp
+    state=present
+  tags: ntp
+
+- name: deploy configuration file
+  template:
+    src=ntp.conf
+    dest=/etc/ntp.conf
+  tags: ntp
+
+- name: enable and start ntp
+  service:
+    name=ntpd
+    enabled=yes
+    state=started
+  tags: ntp

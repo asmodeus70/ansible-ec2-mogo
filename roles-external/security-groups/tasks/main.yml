@@ -1,0 +1,23 @@
+---
+- name: Security Groups
+  ec2_group:
+    name: "{{item.name}}"
+    description: "{{item.description}}"
+    vpc_id: "{{platform_vpcs[deploy_env].id}}"
+    region: "{{aws_region}}"
+    rules: "{{item.rules}}"
+    rules_egress: "{{item.rules_egress if item.rules_egress is defined else omit}}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: sg_result
+  with_items: "{{ec2_sg[deploy_env][ec2_prefix]}}"
+  tags:
+    - security-groups
+    - sg
+
+- name: Dump result
+  debug: msg="{{sg_result}}"
+  tags:
+    - security-groups
+    - sg

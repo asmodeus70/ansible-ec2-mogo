@@ -1,0 +1,18 @@
+---
+dependencies:
+  - asg-action-shutdown
+  - asg-action-startup
+
+galaxy_info:
+  author: cpcundill
+  description: Creates the DVLA default startup and shutdown scheduled actions in an Auto Scaling Group
+  company: Driver and Vehicle Licensing Agency (DVLA)
+  license: license (MIT)
+  min_ansible_version: 2.0
+  platforms:
+    - name: Amazon
+      versions:
+        - all
+  galaxy_tags:
+    - auto-scaling
+    - asg

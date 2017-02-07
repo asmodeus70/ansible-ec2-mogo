@@ -1,0 +1,120 @@
+---
+- name: Set a default value for buildbox user
+  set_fact: build_box_user="unknown"
+  when: build_box_user is not defined
+  tags: [ami]
+
+- name: Debug sts_assumed_role var
+  debug: var=sts_assumed_role
+  tags: [ami]
+
+- name: Set volume snapshot identifier to result of EBS Snapshot
+  set_fact:
+    ami_start_volume_snapshot_id: "{{ebs_snapshot_result.snapshot_id}}"
+  when: "{{ ebs_snapshot_result is defined }}"
+  tags: [ami]
+
+- name: Set volume snapshot identifier to provided ami_start_snapshot_id var
+  set_fact:
+    ami_start_volume_snapshot_id: "{{ami_start_snapshot_id}}"
+  when: "{{ ami_start_snapshot_id is defined }}"
+  tags: [ami]
+
+- name: Set volume snapshot identifier to empty string
+  set_fact:
+    ami_start_volume_snapshot_id: ''
+  when: "{{ ebs_snapshot_result is not defined and ami_start_snapshot_id is not defined }}"
+  tags: [ami]
+
+- name: Find AMI
+  ec2_ami_find:
+    name: "{{ami_start_base_image_name}}"
+    region: "{{ build.launch.region }}"
+    owner: "{{build.launch.owner}}"
+    sort: name
+    sort_order: descending
+    sort_end: 1
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: ami_find
+  when: "{{ami_start_base_image_id is not defined}}"
+  tags: [ami]
+
+- name: Set AMI base image identifier to result of AMI lookup
+  set_fact:
+    ami_start_base_image_id: "{{ami_find.results[0].ami_id}}"
+  when: "{{ami_start_base_image_id is not defined}}"
+  tags: [ami]
+
+- name: Set ami_start_volume fact
+  set_fact:
+    ami_start_volume:
+      device_name: "{{ami_start[ec2_prefix].volume.device_name}}"
+      volume_type: "{{ami_start[ec2_prefix].volume.volume_type}}"
+      volume_size: "{{ami_start[ec2_prefix].volume.volume_size}}"
+      delete_on_termination: "{{ami_start[ec2_prefix].volume.delete_on_termination}}"
+      snapshot: "{{ami_start_volume_snapshot_id}}"
+  when: "{{ ami_start is defined and ami_start[ec2_prefix] is defined and ami_start[ec2_prefix].volume is defined }}"
+  tags: [ami]
+
+- name: Set ami_start_volumes fact
+  set_fact:
+    ami_start_volumes: [ "{{ami_start_volume}}" ]
+  when: "{{ ami_start is defined and ami_start[ec2_prefix] is defined and ami_start[ec2_prefix].volume is defined }}"
+  tags: [ami]
+
+- name: Launch an instance
+  ec2:
+    key_name: "{{ build.launch.key_pair }}"
+    group_id: "{{ build.launch.security_group_id }}"
+    instance_type: "{{ build.launch.instance_type }}"
+    image: "{{ ami_start_base_image_id }}"
+    wait: true
+    region: "{{ build.launch.region }}"
+    vpc_subnet_id: "{{ build.launch.subnet_id }}"
+    assign_public_ip: "{{build.launch.assign_public_ip}}"
+    instance_tags: "{{ build.launch.tags }}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+    instance_profile_name: "{{ami_start_iam_role if ami_start_iam_role is defined else omit}}"
+    volumes: "{{ami_start_volumes if ami_start_volumes is defined else omit}}"
+  register: ec2_build
+  tags: [ami]
+
+- debug: var=ec2_build
+  tags: [ami]
+
+- name: Set IP fact to public IP if defined
+  set_fact:
+    build_instance_ip: "{{ ec2_build.instances[0].public_ip }}"
+  when: "{{ ec2_build.instances[0].public_ip|trim != 'None' }}"
+  tags: [ami]
+
+- name: Set IP fact to private IP if public counterpart not defined
+  set_fact:
+    build_instance_ip: "{{ ec2_build.instances[0].private_ip }}"
+  when: "{{ ec2_build.instances[0].public_ip|trim == 'None' }}"
+  tags: [ami]
+
+- name: Add host to memory host group
+  add_host:
+    hostname: "{{build_instance_ip}}"
+    groupname: memory_hosts
+    aws_region: "{{aws_region}}"
+    ec2_prefix: "{{ec2_prefix}}"
+    mfa_token: "{{mfa_token}}"
+    deploy_env: "{{deploy_env}}"
+    blue_green: "{{blue_green}}"
+  tags: [ami]
+
+- name: Wait for SSH service to bind on new instance
+  wait_for: host={{build_instance_ip}} port=22 delay=60 timeout=320 state=started
+  tags: [ami]
+
+- name: Set output facts
+  set_fact:
+    ec2_build: "{{ec2_build}}"
+    build_instance_id: "{{ ec2_build.instances[0].id }}"
+  tags: [ami]

@@ -1,0 +1,25 @@
+---
+- name: install iptables
+  yum:
+    name=iptables
+    state=present
+  tags: iptables
+
+- name: install iptables services
+  yum:
+    name=iptables-services
+    state=present
+  tags: iptables
+
+- name: define firewall rules
+  template: src=iptables.j2
+    dest=/etc/sysconfig/iptables
+    backup=no
+    owner=0 group=0 mode=0644
+  tags: iptables
+  notify: restart iptables
+
+- name: ensure iptables is enabled and started
+  service: name=iptables state=running enabled=yes
+  tags: iptables
+

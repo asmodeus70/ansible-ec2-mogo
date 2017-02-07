@@ -1,0 +1,18 @@
+- name: Get a session token
+  sts_session_token:
+    region: "{{aws_region}}"
+    profile: "dvlaiam"
+    mfa_token: "{{mfa_token}}"
+    mfa_serial_number: "{{ lookup('env','AWS_MFA_SERIAL_NUMBER') }}"
+    duration_seconds: "{{ session_duration_sec | default(1800) }}"
+  register: tmp_session_role
+  when: mfa_token != ''
+  tags:
+    - always
+    - sts
+
+- set_fact:
+    sts_session_role: "{{tmp_session_role}}"
+  tags:
+    - always
+    - sts

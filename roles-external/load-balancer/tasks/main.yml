@@ -1,0 +1,69 @@
+---
+# Requires ec2_prefix var
+# Requires elb_subnets or elb_subnets_logical_name var
+
+- name: Get subnet identifiers using subnets logical name for ec2_prefix
+  ec2_vpc_subnet_facts:
+    region: "{{aws_region}}"
+    filters:
+      "tag:Logical-Name": "{{ elb_subnets_logical_name }}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+  register: subnet_result
+  when: "{{ elb_subnets_logical_name is defined }}"
+  tags:
+    - load-balancer
+
+- name: Set elb_subnets var to result of subnet lookup
+  set_fact:
+    elb_subnets: "{{ subnet_result.subnets | ec2_subnet_ids_all() }}"
+  when: "{{ elb_subnets_logical_name is defined }}"
+  tags:
+    - load-balancer
+
+- name: Set load balancer fact
+  set_fact:
+    elb_sgs: '[ "{{deploy_env}}-{{ec2_elbs[ec2_prefix].name}}" ]'
+  when: ec2_elbs[ec2_prefix].security_groups is not defined
+  tags:
+    - load-balancer
+
+- name: Set load balancer fact
+  set_fact:
+    elb_sgs: "{{ec2_elbs[ec2_prefix].security_groups}}"
+  when: ec2_elbs[ec2_prefix].security_groups is defined
+  tags:
+    - load-balancer
+
+- name: Create ELB
+  ec2_elb_lb:
+    name: "{{deploy_env}}-{{ec2_elbs[ec2_prefix].name}}-{{blue_green}}"
+    scheme: "{{ec2_elbs[ec2_prefix].scheme}}"
+    state: present
+    cross_az_load_balancing: yes
+    subnets: "{{elb_subnets}}"
+    listeners: "{{ec2_elbs[ec2_prefix].listeners}}"
+    security_group_names: "{{elb_sgs}}"
+    region: "{{aws_region}}"
+    health_check: "{{ ec2_elbs[ec2_prefix].health_check if ec2_elbs[ec2_prefix].health_check is defined else omit }}"
+    aws_access_key: "{{sts_assumed_role.sts_creds.access_key if sts_assumed_role is defined else omit}}"
+    aws_secret_key: "{{sts_assumed_role.sts_creds.secret_key if sts_assumed_role is defined else omit}}"
+    security_token: "{{sts_assumed_role.sts_creds.session_token if sts_assumed_role is defined else omit}}"
+    access_logs: "{{ ec2_elbs[ec2_prefix].access_logs if ec2_elbs[ec2_prefix].access_logs is defined else omit }}"
+  tags:
+    Name: "{{deploy_env}}-{{ec2_elbs[ec2_prefix].name}}-{{blue_green}}"
+    Service: "{{project.service_id}}"
+    Environment: "{{deploy_env}}"
+    Project: "{{project.name}}"
+  register: elb_result
+  until: "elb_result.module_stderr is not defined"
+  retries: 2
+  delay: 1
+  tags:
+    - load-balancer
+
+- name: Dump elb_result
+  debug: msg={{elb_result}}
+  tags:
+    - load-balancer

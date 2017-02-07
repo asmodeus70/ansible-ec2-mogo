@@ -1,0 +1,29 @@
+---
+- hosts: localhost
+  vars_prompt:
+    - name: deploy_region
+      prompt: "Which region? (eu-west-1, eu-central-1)"
+      private: no
+      default: eu-west-1
+    - name: deploy_environment
+      prompt: Which environment? (mgmt)
+      private: no
+      default: mgmt
+    - name: deploy_colour
+      prompt: Blue or Green? (green)
+      private: no
+      default: green
+    - name: deploy_mfa_token
+      prompt: Enter MFA Token for IAM Account
+      private: no
+
+  tasks:
+    - name: Set facts for prompt inputs
+      set_fact:
+        aws_region: "{{deploy_region}}"
+        deploy_env: "{{deploy_environment}}"
+        blue_green: "{{deploy_colour}}"
+        mfa_token: "{{deploy_mfa_token}}"
+
+  tags:
+    - always

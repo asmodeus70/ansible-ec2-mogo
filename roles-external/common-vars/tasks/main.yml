@@ -1,0 +1,11 @@
+---
+- name: Get timestamp
+  command: date +%Y%m%d%H%M
+  register: timestamp
+  tags:
+    - always
+
+- name: Set ec2_prefix
+  set_fact: ec2_prefix="{{ec2_prefix}}"
+  tags:
+    - always

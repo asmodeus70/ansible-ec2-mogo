@@ -1,0 +1,10 @@
+---
+dependencies:
+  - { role: clamav }
+  - { role: sshd-config }
+  - { role: disable-ipv6 }
+  - { role: cron-amend-mailto }
+  - { role: bash-prompt }
+  - { role: yum-config }
+  - { role: yum-updates }
+  - { role: iptables }
